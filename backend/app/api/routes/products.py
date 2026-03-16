@@ -1,11 +1,31 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
 
-router = APIRouter()
+from app.core.database import get_db
+from app.models.product import Product
+from app.schemas.product import ProductOut
 
-@router.get("/products")
-def get_products():
-    return {"products": []}
+router = APIRouter(tags=["products"])
 
-@router.get("/products/{product_id}")
-def get_product(product_id: int):
-    return {"product_id": product_id}
+
+@router.get("/products", response_model=list[ProductOut])
+def get_products(
+    category_id: int | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Product)
+
+    if category_id is not None:
+        query = query.filter(Product.category_id == category_id)
+
+    return query.order_by(Product.id).all()
+
+
+@router.get("/products/{product_id}", response_model=ProductOut)
+def get_product(product_id: int, db: Session = Depends(get_db)):
+    product = db.query(Product).filter(Product.id == product_id).first()
+
+    if product is None:
+        raise HTTPException(status_code=404, detail="Товар не найден")
+
+    return product

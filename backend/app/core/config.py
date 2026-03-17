@@ -8,7 +8,10 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://mf:mf@db:5432/mf"
     redis_url: str = "redis://redis:6379/0"
+
     jwt_secret: str = "dev-secret-change-me"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

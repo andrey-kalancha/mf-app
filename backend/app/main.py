@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api.routes import health, categories, products
+from app.api.routes import health, categories, products, auth
 from app.core.config import settings
 from app.core.database import Base, engine
 
@@ -17,5 +17,6 @@ app = FastAPI(
 )
 
 app.include_router(health.router)
+app.include_router(auth.router, prefix=settings.api_prefix)
 app.include_router(categories.router, prefix=settings.api_prefix)
 app.include_router(products.router, prefix=settings.api_prefix)

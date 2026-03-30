@@ -39,4 +39,27 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Пользователь деактивирован",
+        )
+
     return user
+
+
+def require_authenticated(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    return current_user
+
+
+def require_admin(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Доступ только для администратора",
+        )
+    return current_user

@@ -8,6 +8,13 @@ class ProductCreate(BaseModel):
     category_id: int
 
 
+class ProductUpdate(BaseModel):
+    name: str
+    sku: str
+    price: float
+    category_id: int
+
+
 class ProductOut(BaseModel):
     id: int
     name: str

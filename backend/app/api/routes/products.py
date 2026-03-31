@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import require_admin
 from app.core.database import get_db
 from app.models.product import Product
-from app.schemas.product import ProductOut, ProductCreate
+from app.schemas.product import ProductOut, ProductCreate, ProductUpdate
 
 router = APIRouter(tags=["products"])
 
@@ -31,7 +31,8 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
 
     return product
 
-@router.post("/products", response_model=ProductOut)
+
+@router.post("/products", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
 def create_product(
     product_in: ProductCreate,
     db: Session = Depends(get_db),
@@ -42,3 +43,40 @@ def create_product(
     db.commit()
     db.refresh(product)
     return product
+
+
+@router.put("/products/{product_id}", response_model=ProductOut)
+def update_product(
+    product_id: int,
+    product_in: ProductUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_admin),
+):
+    product = db.query(Product).filter(Product.id == product_id).first()
+
+    if product is None:
+        raise HTTPException(status_code=404, detail="Товар не найден")
+
+    product.name = product_in.name
+    product.sku = product_in.sku
+    product.price = product_in.price
+    product.category_id = product_in.category_id
+
+    db.commit()
+    db.refresh(product)
+    return product
+
+
+@router.delete("/products/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_admin),
+):
+    product = db.query(Product).filter(Product.id == product_id).first()
+
+    if product is None:
+        raise HTTPException(status_code=404, detail="Товар не найден")
+
+    db.delete(product)
+    db.commit()

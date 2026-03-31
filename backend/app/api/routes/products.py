@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import require_admin
 from app.core.database import get_db
 from app.models.product import Product
+from app.models.category import Category
 from app.schemas.product import ProductOut, ProductCreate, ProductUpdate
 
 router = APIRouter(tags=["products"])
@@ -38,6 +39,20 @@ def create_product(
     db: Session = Depends(get_db),
     current_user=Depends(require_admin),
 ):
+    existing_product = db.query(Product).filter(Product.sku == product_in.sku).first()
+    if existing_product:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Товар с таким SKU уже существует",
+        )
+
+    category = db.query(Category).filter(Category.id == product_in.category_id).first()
+    if category is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Указанная категория не существует",
+        )
+
     product = Product(**product_in.model_dump())
     db.add(product)
     db.commit()
@@ -56,6 +71,24 @@ def update_product(
 
     if product is None:
         raise HTTPException(status_code=404, detail="Товар не найден")
+
+    existing_product = (
+        db.query(Product)
+        .filter(Product.sku == product_in.sku, Product.id != product_id)
+        .first()
+    )
+    if existing_product:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Товар с таким SKU уже существует",
+        )
+
+    category = db.query(Category).filter(Category.id == product_in.category_id).first()
+    if category is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Указанная категория не существует",
+        )
 
     product.name = product_in.name
     product.sku = product_in.sku

@@ -11,6 +11,23 @@ class UserLogin(BaseModel):
     password: str
 
 
+class UserUpdate(BaseModel):
+    email: EmailStr
+
+
+class UserPasswordUpdate(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class UserRoleUpdate(BaseModel):
+    role: str
+
+
+class UserActiveUpdate(BaseModel):
+    is_active: bool
+
+
 class UserOut(BaseModel):
     id: int
     email: EmailStr

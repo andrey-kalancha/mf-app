@@ -1,0 +1,144 @@
+.home-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 32px;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.hero__content h1 {
+  margin: 0 0 20px;
+  font-size: 68px;
+  line-height: 1.05;
+  color: #ffffff;
+}
+
+.hero__content p {
+  margin: 0 0 28px;
+  font-size: 22px;
+  line-height: 1.6;
+  color: #b8c0cf;
+  max-width: 700px;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero__btn {
+  display: inline-block;
+  padding: 14px 24px;
+  border-radius: 14px;
+  background: #6c63ff;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.hero__btn:hover {
+  background: #584ff0;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.hero__btn--secondary {
+  background: transparent;
+  border: 1px solid #2f3750;
+  color: #dbe3f2;
+}
+
+.hero__btn--secondary:hover {
+  background: #151b2a;
+}
+
+.hero__visual {
+  min-height: 420px;
+  border-radius: 28px;
+  border: 1px solid #2b3245;
+  background:
+    radial-gradient(circle at top left, rgba(108, 99, 255, 0.28), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(55, 125, 255, 0.22), transparent 35%),
+    linear-gradient(135deg, #182033, #0f1422);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.3);
+}
+
+.hero__visual-box {
+  width: 78%;
+  height: 78%;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(9, 13, 24, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dfe7f7;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  padding: 24px;
+}
+
+.features {
+  margin-top: 56px;
+}
+
+.features h2 {
+  margin: 0 0 24px;
+  font-size: 38px;
+  color: #fff;
+}
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.feature-card {
+  padding: 24px;
+  border-radius: 20px;
+  background: #151925;
+  border: 1px solid #2b3245;
+}
+
+.feature-card h3 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  color: #fff;
+}
+
+.feature-card p {
+  margin: 0;
+  color: #b8c0cf;
+  line-height: 1.6;
+}
+
+@media (max-width: 980px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__content h1 {
+    font-size: 52px;
+  }
+
+  .hero__visual {
+    min-height: 300px;
+  }
+
+  .features__grid {
+    grid-template-columns: 1fr;
+  }
+}

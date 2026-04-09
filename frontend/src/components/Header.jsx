@@ -65,6 +65,17 @@ export default function Header() {
             Корзина
           </NavLink>
 
+          {auth && (
+            <NavLink
+              to="/orders"
+              className={({ isActive }) =>
+                isActive ? "site-nav__link active" : "site-nav__link"
+              }
+            >
+              Заказы
+            </NavLink>
+          )}
+
           {auth ? (
             <button className="site-nav__logout" onClick={handleLogout}>
               Выйти

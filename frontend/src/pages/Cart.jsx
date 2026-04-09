@@ -95,6 +95,33 @@ export default function Cart() {
     }
   };
 
+  const handleCreateOrder = async () => {
+    try {
+      const orderData = {
+        items: cart.items.map((item) => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+        })),
+      };
+
+      // создаём заказ
+      await api.post("/orders", orderData);
+
+      // очищаем корзину
+      await Promise.all(
+        cart.items.map((item) => api.delete(`/cart/items/${item.id}`))
+      );
+
+      alert("Заказ успешно оформлен!");
+
+      // обновляем корзину
+      await loadCart();
+    } catch (err) {
+      console.error("Ошибка заказа:", err);
+      alert("Ошибка при оформлении заказа");
+    }
+  };
+
   if (loading) {
     return <h1 className="cart-title">Загрузка корзины...</h1>;
   }
@@ -151,7 +178,10 @@ export default function Cart() {
           <aside className="cart-summary">
             <h2>Итого</h2>
             <p>{total} ₽</p>
-            <button className="cart-order-btn">Оформить заказ</button>
+
+            <button className="cart-order-btn" onClick={handleCreateOrder}>
+              Оформить заказ
+            </button>
           </aside>
         </div>
       )}

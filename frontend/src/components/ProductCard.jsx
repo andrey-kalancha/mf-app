@@ -1,26 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { isAuthenticated } from "../services/auth";
 
 export default function ProductCard({ product }) {
+  const navigate = useNavigate();
+
   const addToCart = async () => {
-  try {
-    await api.post("/cart/items", {
-      product_id: product.id,
-      quantity: 1,
-    });
-
-    alert("Товар добавлен в корзину");
-  } catch (err) {
-    console.error("Ошибка добавления:", err);
-
-    if (err.response?.status === 401) {
-      alert("Сначала войдите в аккаунт");
+    if (!isAuthenticated()) {
+      navigate("/login");
       return;
     }
 
-    alert("Ошибка добавления в корзину");
-  }
-};
+    try {
+      await api.post("/cart/items", {
+        product_id: product.id,
+        quantity: 1,
+      });
+
+      alert("Товар добавлен в корзину");
+    } catch (err) {
+      console.error("Ошибка добавления:", err);
+      alert("Ошибка добавления в корзину");
+    }
+  };
 
   return (
     <div className="product-card">

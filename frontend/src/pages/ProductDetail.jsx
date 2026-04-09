@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
+import { isAuthenticated } from "../services/auth";
 import "./ProductDetail.css";
 
 export default function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,6 +22,25 @@ export default function ProductDetail() {
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  const handleAddToCart = async () => {
+    if (!isAuthenticated()) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      await api.post("/cart/items", {
+        product_id: product.id,
+        quantity: 1,
+      });
+
+      alert("Товар добавлен в корзину");
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка добавления");
+    }
+  };
 
   if (loading) {
     return <h1 className="product-detail-title">Загрузка...</h1>;
@@ -47,23 +69,9 @@ export default function ProductDetail() {
           <p className="product-detail-price">{product.price} ₽</p>
           <p className="product-detail-sku">Артикул: {product.sku}</p>
 
-          <button
-  className="product-detail-btn"
-  onClick={async () => {
-    try {
-      await api.post("/cart/items", {
-        product_id: product.id,
-        quantity: 1,
-      });
-      alert("Товар добавлен в корзину");
-    } catch (err) {
-      console.error(err);
-      alert("Ошибка добавления");
-    }
-  }}
->
-  Добавить в корзину
-</button>
+          <button className="product-detail-btn" onClick={handleAddToCart}>
+            Добавить в корзину
+          </button>
         </div>
       </div>
     </section>

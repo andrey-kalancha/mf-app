@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { setToken } from "../services/auth";
 import "./Login.css";
@@ -22,35 +22,35 @@ export default function Login() {
     }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  try {
-    const params = new URLSearchParams();
-    params.append("username", form.email);
-    params.append("password", form.password);
-    params.append("grant_type", "password");
+    try {
+      const params = new URLSearchParams();
+      params.append("username", form.email);
+      params.append("password", form.password);
+      params.append("grant_type", "password");
 
-    const response = await api.post("/auth/login", params, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+      const response = await api.post("/auth/login", params, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
 
-    const token = response.data.access_token;
+      const token = response.data.access_token;
 
-    setToken(token);
-    navigate("/catalog");
-    window.location.reload();
-  } catch (err) {
-    console.error("Ошибка логина:", err);
-    setError("Неверный логин или пароль");
-  } finally {
-    setLoading(false);
-  }
-};
+      setToken(token);
+      navigate("/catalog");
+      window.location.reload();
+    } catch (err) {
+      console.error("Ошибка логина:", err);
+      setError("Неверный логин или пароль");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="login-page">
@@ -80,6 +80,10 @@ const handleSubmit = async (e) => {
         <button type="submit" disabled={loading}>
           {loading ? "Входим..." : "Войти"}
         </button>
+
+        <p className="login-switch">
+          Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+        </p>
       </form>
     </section>
   );

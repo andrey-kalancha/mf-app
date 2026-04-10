@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { setToken } from "../services/auth";
 import "./Login.css";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ export default function Login() {
       const token = response.data.access_token;
 
       setToken(token);
+      toast.success("Вы успешно вошли");
       navigate("/catalog");
       window.location.reload();
     } catch (err) {

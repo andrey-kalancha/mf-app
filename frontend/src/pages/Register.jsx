@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "./Register.css";
+import toast from "react-hot-toast";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ export default function Register() {
       await api.post("/auth/register", form);
 
       setSuccess("Регистрация успешна!");
+      toast.success("Регистрация успешна");
 
       setTimeout(() => {
         navigate("/login");

@@ -1,0 +1,68 @@
+.admin-product-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 50px 24px 80px;
+}
+
+.admin-product-card {
+  background: #151925;
+  border: 1px solid #2b3245;
+  border-radius: 24px;
+  padding: 32px;
+}
+
+.admin-product-card h1 {
+  margin: 0 0 24px;
+  color: #fff;
+  font-size: 42px;
+  text-align: center;
+}
+
+.admin-product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-product-form input,
+.admin-product-form textarea,
+.admin-product-form select {
+  padding: 14px 16px;
+  border: 1px solid #2b3245;
+  border-radius: 12px;
+  background: #0f1320;
+  color: #fff;
+  font-size: 16px;
+  outline: none;
+}
+
+.admin-product-form textarea {
+  resize: vertical;
+}
+
+.admin-product-form input:focus,
+.admin-product-form textarea:focus,
+.admin-product-form select:focus {
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+}
+
+.admin-product-form button {
+  padding: 14px 16px;
+  border: none;
+  border-radius: 12px;
+  background: #6c63ff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-product-form button:hover {
+  background: #584ff0;
+}
+
+.admin-product-form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

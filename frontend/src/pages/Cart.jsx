@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
 import "./Cart.css";
+import toast from "react-hot-toast";
 
 export default function Cart() {
   const [cart, setCart] = useState(null);
@@ -81,7 +82,7 @@ export default function Cart() {
       await loadCart();
     } catch (err) {
       console.error("Ошибка обновления количества:", err);
-      alert("Не удалось изменить количество");
+      toast.error("Не удалось изменить количество");
     }
   };
 
@@ -91,7 +92,7 @@ export default function Cart() {
       await loadCart();
     } catch (err) {
       console.error("Ошибка удаления товара:", err);
-      alert("Не удалось удалить товар");
+      toast.error("Не удалось удалить товар");
     }
   };
 
@@ -112,13 +113,13 @@ export default function Cart() {
         cart.items.map((item) => api.delete(`/cart/items/${item.id}`))
       );
 
-      alert("Заказ успешно оформлен!");
+      toast.success("Заказ успешно оформлен!");
 
       // обновляем корзину
       await loadCart();
     } catch (err) {
       console.error("Ошибка заказа:", err);
-      alert("Ошибка при оформлении заказа");
+      toast.error("Ошибка при оформлении заказа");
     }
   };
 

@@ -10,6 +10,8 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Orders from "./pages/Orders";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
+import AdminCreateProduct from "./pages/AdminCreateProduct";
 
 function App() {
   return (
@@ -38,6 +40,24 @@ function App() {
             element={
               <ProtectedRoute>
                 <Orders />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/products/create"
+            element={
+              <ProtectedRoute>
+                <AdminCreateProduct />
               </ProtectedRoute>
             }
           />

@@ -83,3 +83,21 @@
     font-size: 36px;
   }
 }
+.product-detail-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.product-detail-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: #2c3448;
+}
+
+.product-detail-btn-secondary:hover {
+  background: #3a445d;
+  text-decoration: none;
+}

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { isAuthenticated } from "../services/auth";
+import toast from "react-hot-toast";
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
@@ -17,10 +18,10 @@ export default function ProductCard({ product }) {
         quantity: 1,
       });
 
-      alert("Товар добавлен в корзину");
+      toast.success("Товар добавлен в корзину");
     } catch (err) {
       console.error("Ошибка добавления:", err);
-      alert("Ошибка добавления в корзину");
+      toast.error("Ошибка добавления в корзину");
     }
   };
 

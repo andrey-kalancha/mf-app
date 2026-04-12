@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import About from "./pages/About";
@@ -12,6 +13,9 @@ import Orders from "./pages/Orders";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import AdminCreateProduct from "./pages/AdminCreateProduct";
+import AdminCreateCategory from "./pages/AdminCreateCategory";
+import AdminEditProduct from "./pages/AdminEditProduct";
+import AdminEditCategory from "./pages/AdminEditCategory";
 
 function App() {
   return (
@@ -56,10 +60,35 @@ function App() {
           <Route
             path="/admin/products/create"
             element={
-              <ProtectedRoute>
+              <AdminRoute>
                 <AdminCreateProduct />
-              </ProtectedRoute>
+              </AdminRoute>
             }
+          />
+
+          <Route
+            path="/admin/categories/create"
+            element={
+              <AdminRoute>
+                <AdminCreateCategory />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/products/edit/:id"
+            element={
+           <AdminRoute>
+           <AdminEditProduct />
+           </AdminRoute>
+             }
+          />
+          <Route
+            path="/admin/categories/edit/:id"
+            element={
+            <AdminRoute>
+           <AdminEditCategory />
+          </AdminRoute>
+              }
           />
         </Routes>
       </Layout>

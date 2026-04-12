@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
-import { setToken } from "../services/auth";
-import "./Login.css";
+import { setCurrentUser, setToken } from "../services/auth";
 import toast from "react-hot-toast";
+import "./Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -41,8 +41,11 @@ export default function Login() {
       });
 
       const token = response.data.access_token;
-
       setToken(token);
+
+      const meResponse = await api.get("/auth/me");
+      setCurrentUser(meResponse.data);
+
       toast.success("Вы успешно вошли");
       navigate("/catalog");
       window.location.reload();

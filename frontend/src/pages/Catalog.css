@@ -147,3 +147,20 @@
   border-color: #6c63ff;
   box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
 }
+.catalog-category-admin-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catalog-category-edit-link {
+  color: #8f86ff;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.catalog-category-edit-link:hover {
+  text-decoration: none;
+  color: #b2acff;
+}

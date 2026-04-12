@@ -1,12 +1,19 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { isAuthenticated, removeToken } from "../services/auth";
+import {
+  getCurrentUser,
+  isAdmin,
+  isAuthenticated,
+  removeToken,
+} from "../services/auth";
 import { getCartCount } from "../services/cart";
 import "./Header.css";
 
 export default function Header() {
   const navigate = useNavigate();
   const auth = isAuthenticated();
+  const admin = isAdmin();
+  const user = getCurrentUser();
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
@@ -73,45 +80,58 @@ export default function Header() {
             Контакты
           </NavLink>
 
-            {auth && (
-  <>
-    <NavLink
-      to="/cart"
-      className={({ isActive }) =>
-        isActive ? "site-nav__link active" : "site-nav__link"
-      }
-    >
-      Корзина {cartCount > 0 ? `(${cartCount})` : ""}
-    </NavLink>
+          {auth && (
+            <>
+              <NavLink
+                to="/cart"
+                className={({ isActive }) =>
+                  isActive ? "site-nav__link active" : "site-nav__link"
+                }
+              >
+                Корзина {cartCount > 0 ? `(${cartCount})` : ""}
+              </NavLink>
 
-    <NavLink
-      to="/orders"
-      className={({ isActive }) =>
-        isActive ? "site-nav__link active" : "site-nav__link"
-      }
-    >
-      Заказы
-    </NavLink>
+              <NavLink
+                to="/orders"
+                className={({ isActive }) =>
+                  isActive ? "site-nav__link active" : "site-nav__link"
+                }
+              >
+                Заказы
+              </NavLink>
 
-    <NavLink
-      to="/profile"
-      className={({ isActive }) =>
-        isActive ? "site-nav__link active" : "site-nav__link"
-      }
-    >
-      Профиль
-    </NavLink>
+              <NavLink
+                to="/profile"
+                className={({ isActive }) =>
+                  isActive ? "site-nav__link active" : "site-nav__link"
+                }
+              >
+                {user?.email ? user.email : "Профиль"}
+              </NavLink>
 
-    <NavLink
-      to="/admin/products/create"
-      className={({ isActive }) =>
-        isActive ? "site-nav__link active" : "site-nav__link"
-      }
-    >
-      Добавить товар
-    </NavLink>
-  </>
-)}
+              {admin && (
+                <>
+                  <NavLink
+                    to="/admin/products/create"
+                    className={({ isActive }) =>
+                      isActive ? "site-nav__link active" : "site-nav__link"
+                    }
+                  >
+                    Добавить товар
+                  </NavLink>
+
+                  <NavLink
+                    to="/admin/categories/create"
+                    className={({ isActive }) =>
+                      isActive ? "site-nav__link active" : "site-nav__link"
+                    }
+                  >
+                    Добавить категорию
+                  </NavLink>
+                </>
+              )}
+            </>
+          )}
 
           {auth ? (
             <button className="site-nav__logout" onClick={handleLogout}>

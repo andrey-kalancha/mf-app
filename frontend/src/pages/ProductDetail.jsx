@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
-import { isAuthenticated } from "../services/auth";
-import "./ProductDetail.css";
+import { isAdmin, isAuthenticated } from "../services/auth";
 import toast from "react-hot-toast";
+import "./ProductDetail.css";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -24,24 +24,24 @@ export default function ProductDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-const handleAddToCart = async () => {
-  if (!isAuthenticated()) {
-    navigate("/login");
-    return;
-  }
+  const handleAddToCart = async () => {
+    if (!isAuthenticated()) {
+      navigate("/login");
+      return;
+    }
 
-  try {
-    await api.post("/cart/items", {
-      product_id: product.id,
-      quantity: 1,
-    });
+    try {
+      await api.post("/cart/items", {
+        product_id: product.id,
+        quantity: 1,
+      });
 
-    toast.success("Товар добавлен в корзину");
-  } catch (err) {
-    console.error(err);
-    toast.error("Ошибка добавления");
-  }
-};
+      toast.success("Товар добавлен в корзину");
+    } catch (err) {
+      console.error(err);
+      toast.error("Ошибка добавления");
+    }
+  };
 
   if (loading) {
     return <h1 className="product-detail-title">Загрузка...</h1>;
@@ -70,11 +70,22 @@ const handleAddToCart = async () => {
           <p className="product-detail-price">{product.price} ₽</p>
           <p className="product-detail-sku">Артикул: {product.sku}</p>
 
-          <button className="product-detail-btn" onClick={handleAddToCart}>
-            Добавить в корзину
-          </button>
+          <div className="product-detail-actions">
+            <button className="product-detail-btn" onClick={handleAddToCart}>
+              Добавить в корзину
+            </button>
+
+            {isAdmin() && (
+              <Link
+                to={`/admin/products/edit/${product.id}`}
+                className="product-detail-btn product-detail-btn-secondary"
+              >
+                Редактировать
+              </Link>
+            )}
+          </div>
         </div>
       </div>
-      </section>
-    );
+    </section>
+  );
 }

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../services/api";
-import "./Catalog.css";
+import { isAdmin } from "../services/auth";
 import ProductCard from "../components/ProductCard";
+import "./Catalog.css";
 
 export default function Catalog() {
   const [products, setProducts] = useState([]);
@@ -9,6 +11,8 @@ export default function Catalog() {
   const [selectedCategoryId, setSelectedCategoryId] = useState("all");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const admin = isAdmin();
 
   useEffect(() => {
     Promise.all([api.get("/products"), api.get("/categories")])
@@ -79,17 +83,27 @@ export default function Catalog() {
         </button>
 
         {categories.map((category) => (
-          <button
-            key={category.id}
-            className={
-              String(selectedCategoryId) === String(category.id)
-                ? "catalog-filter-btn active"
-                : "catalog-filter-btn"
-            }
-            onClick={() => setSelectedCategoryId(category.id)}
-          >
-            {category.name}
-          </button>
+          <div key={category.id} className="catalog-category-admin-wrap">
+            <button
+              className={
+                String(selectedCategoryId) === String(category.id)
+                  ? "catalog-filter-btn active"
+                  : "catalog-filter-btn"
+              }
+              onClick={() => setSelectedCategoryId(category.id)}
+            >
+              {category.name}
+            </button>
+
+            {admin && (
+              <Link
+                to={`/admin/categories/edit/${category.id}`}
+                className="catalog-category-edit-link"
+              >
+                ✎
+              </Link>
+            )}
+          </div>
         ))}
       </div>
 

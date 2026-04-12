@@ -1,32 +1,30 @@
-.admin-product-page {
-  max-width: 900px;
+.admin-category-page {
+  max-width: 700px;
   margin: 0 auto;
   padding: 50px 24px 80px;
 }
 
-.admin-product-card {
+.admin-category-card {
   background: #151925;
   border: 1px solid #2b3245;
   border-radius: 24px;
   padding: 32px;
 }
 
-.admin-product-card h1 {
+.admin-category-card h1 {
   margin: 0 0 24px;
   color: #fff;
   font-size: 42px;
   text-align: center;
 }
 
-.admin-product-form {
+.admin-category-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.admin-product-form input,
-.admin-product-form textarea,
-.admin-product-form select {
+.admin-category-form input {
   padding: 14px 16px;
   border: 1px solid #2b3245;
   border-radius: 12px;
@@ -36,18 +34,12 @@
   outline: none;
 }
 
-.admin-product-form textarea {
-  resize: vertical;
-}
-
-.admin-product-form input:focus,
-.admin-product-form textarea:focus,
-.admin-product-form select:focus {
+.admin-category-form input:focus {
   border-color: #6c63ff;
   box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
 }
 
-.admin-product-form button {
+.admin-category-form button {
   padding: 14px 16px;
   border: none;
   border-radius: 12px;
@@ -58,15 +50,15 @@
   cursor: pointer;
 }
 
-.admin-product-form button:hover {
+.admin-category-form button:hover {
   background: #584ff0;
 }
 
-.admin-product-form button:disabled {
+.admin-category-form button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
-.admin-product-delete-btn {
+.admin-category-delete-btn {
   padding: 14px 16px;
   border: none;
   border-radius: 12px;
@@ -77,6 +69,6 @@
   cursor: pointer;
 }
 
-.admin-product-delete-btn:hover {
+.admin-category-delete-btn:hover {
   background: #3a445d;
 }

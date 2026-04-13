@@ -128,6 +128,22 @@ export default function Header() {
                   >
                     Добавить категорию
                   </NavLink>
+                  <NavLink
+                   to="/admin"
+                    className={({ isActive }) =>
+                      isActive ? "site-nav__link active" : "site-nav__link"
+                    }
+                  >
+                    Админка
+                  </NavLink>
+                  <NavLink
+                  to="/admin/orders"
+                  className={({ isActive }) =>
+                    isActive ? "site-nav__link active" : "site-nav__link"
+                  }
+                >
+                  Все заказы
+                </NavLink>
                 </>
               )}
             </>

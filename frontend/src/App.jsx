@@ -16,6 +16,8 @@ import AdminCreateProduct from "./pages/AdminCreateProduct";
 import AdminCreateCategory from "./pages/AdminCreateCategory";
 import AdminEditProduct from "./pages/AdminEditProduct";
 import AdminEditCategory from "./pages/AdminEditCategory";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminOrders from "./pages/AdminOrders";
 
 function App() {
   return (
@@ -89,6 +91,22 @@ function App() {
            <AdminEditCategory />
           </AdminRoute>
               }
+          />
+          <Route
+            path="/admin"
+            element={
+            <AdminRoute>
+             <AdminDashboard />
+             </AdminRoute>
+                }
+          />
+          <Route
+           path="/admin/orders"
+            element={
+            <AdminRoute>
+            <AdminOrders />
+            </AdminRoute>
+                  }
           />
         </Routes>
       </Layout>

@@ -62,6 +62,20 @@
   background: #584ff0;
 }
 
+.profile-btn {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #6c63ff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.profile-btn:hover {
+  background: #584ff0;
+}
+
 @media (max-width: 700px) {
   .profile-row {
     flex-direction: column;

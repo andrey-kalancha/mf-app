@@ -1,74 +1,121 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../services/api";
-import { removeToken } from "../services/auth";
+import toast from "react-hot-toast";
 import "./Profile.css";
 
 export default function Profile() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
+  const [email, setEmail] = useState("");
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  const loadProfile = async () => {
+    try {
+      const res = await api.get("/profile");
+      setProfile(res.data);
+      setEmail(res.data.email || "");
+    } catch (err) {
+      console.error(err);
+      toast.error("Ошибка загрузки профиля");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const response = await api.get("/auth/me");
-        setUser(response.data);
-      } catch (err) {
-        console.error("Ошибка загрузки профиля:", err);
-        setError("Не удалось загрузить профиль");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadProfile();
   }, []);
 
-  const handleLogout = () => {
-    removeToken();
-    navigate("/login");
-    window.location.reload();
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+
+    try {
+      await api.put("/profile", {
+        email,
+      });
+
+      toast.success("Профиль обновлен");
+      loadProfile();
+    } catch (err) {
+      console.error(err);
+      toast.error("Ошибка обновления профиля");
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+
+    if (!currentPassword || !newPassword) {
+      toast.error("Заполни все поля");
+      return;
+    }
+
+    try {
+      await api.put("/profile/password", {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+
+      toast.success("Пароль изменен");
+
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (err) {
+      console.error(err);
+      toast.error("Ошибка смены пароля");
+    }
   };
 
   if (loading) {
-    return <h1 className="profile-title">Загрузка профиля...</h1>;
-  }
-
-  if (error) {
-    return <h1 className="profile-title">{error}</h1>;
+    return <h1 className="profile-title">Загрузка...</h1>;
   }
 
   return (
     <section className="profile-page">
-      <div className="profile-card">
-        <h1 className="profile-title">Профиль</h1>
+      <h1 className="profile-title">Профиль</h1>
 
-        <div className="profile-info">
-          <div className="profile-row">
-            <span>Email</span>
-            <strong>{user?.email || "—"}</strong>
-          </div>
+      <div className="profile-grid">
+        {/* ОБНОВЛЕНИЕ ПРОФИЛЯ */}
+        <form className="profile-card" onSubmit={handleUpdateProfile}>
+          <h2>Данные</h2>
 
-          <div className="profile-row">
-            <span>ID</span>
-            <strong>{user?.id || "—"}</strong>
-          </div>
+          <label>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-          <div className="profile-row">
-            <span>Роль</span>
-            <strong>
-              {user?.is_admin === true
-                ? "Администратор"
-                : user?.role || "Пользователь"}
-            </strong>
-          </div>
-        </div>
+          <button type="submit" className="profile-btn">
+            Сохранить
+          </button>
+        </form>
 
-        <button className="profile-logout-btn" onClick={handleLogout}>
-          Выйти
-        </button>
+        {/* СМЕНА ПАРОЛЯ */}
+        <form className="profile-card" onSubmit={handleChangePassword}>
+          <h2>Смена пароля</h2>
+
+          <label>Текущий пароль</label>
+          <input
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+          />
+
+          <label>Новый пароль</label>
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+
+          <button type="submit" className="profile-btn">
+            Изменить пароль
+          </button>
+        </form>
       </div>
     </section>
   );

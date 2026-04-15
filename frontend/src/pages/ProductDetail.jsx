@@ -14,6 +14,9 @@ export default function ProductDetail() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    setLoading(true);
+    setError("");
+
     api
       .get(`/products/${id}`)
       .then((res) => setProduct(res.data))
@@ -26,6 +29,7 @@ export default function ProductDetail() {
 
   const handleAddToCart = async () => {
     if (!isAuthenticated()) {
+      toast("Сначала войдите в аккаунт");
       navigate("/login");
       return;
     }
@@ -44,45 +48,127 @@ export default function ProductDetail() {
   };
 
   if (loading) {
-    return <h1 className="product-detail-title">Загрузка...</h1>;
+    return (
+      <section className="product-detail-page">
+        <div className="product-detail-shell">
+          <div className="product-detail-breadcrumbs">
+            <span>Каталог</span>
+            <span className="product-detail-breadcrumbs__sep">/</span>
+            <span>Загрузка</span>
+          </div>
+
+          <div className="product-detail-card product-detail-card--loading">
+            <div className="product-detail-image product-detail-skeleton" />
+            <div className="product-detail-info">
+              <div className="product-detail-skeleton product-detail-skeleton--title" />
+              <div className="product-detail-skeleton product-detail-skeleton--text" />
+              <div className="product-detail-skeleton product-detail-skeleton--text short" />
+              <div className="product-detail-skeleton product-detail-skeleton--price" />
+              <div className="product-detail-skeleton product-detail-skeleton--sku" />
+              <div className="product-detail-actions">
+                <div className="product-detail-skeleton product-detail-skeleton--button" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   if (error) {
-    return <h1 className="product-detail-title">{error}</h1>;
+    return (
+      <section className="product-detail-page">
+        <div className="product-detail-shell">
+          <div className="product-state-card">
+            <h1 className="product-state-title">Ошибка загрузки</h1>
+            <p className="product-state-text">{error}</p>
+            <Link to="/catalog" className="product-detail-btn">
+              Вернуться в каталог
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   if (!product) {
-    return <h1 className="product-detail-title">Товар не найден</h1>;
+    return (
+      <section className="product-detail-page">
+        <div className="product-detail-shell">
+          <div className="product-state-card">
+            <h1 className="product-state-title">Товар не найден</h1>
+            <p className="product-state-text">
+              Возможно, товар был удалён или ссылка устарела.
+            </p>
+            <Link to="/catalog" className="product-detail-btn">
+              Перейти в каталог
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
     <section className="product-detail-page">
-      <div className="product-detail-card">
-        <div className="product-detail-image">Нет фото</div>
+      <div className="product-detail-shell">
+        <div className="product-detail-breadcrumbs">
+          <Link to="/catalog">Каталог</Link>
+          <span className="product-detail-breadcrumbs__sep">/</span>
+          <span>{product.name}</span>
+        </div>
 
-        <div className="product-detail-info">
-          <h1 className="product-detail-title">{product.name}</h1>
+        <div className="product-detail-card">
+          <div className="product-detail-image-wrap">
+            <div className="product-detail-image">
+              <span className="product-detail-image__label">MFA</span>
+              <span className="product-detail-image__placeholder">Нет фото</span>
+            </div>
+          </div>
 
-          {product.description && (
-            <p className="product-detail-description">{product.description}</p>
-          )}
+          <div className="product-detail-info">
+            <div className="product-detail-badge">Карточка товара</div>
 
-          <p className="product-detail-price">{product.price} ₽</p>
-          <p className="product-detail-sku">Артикул: {product.sku}</p>
+            <h1 className="product-detail-title">{product.name}</h1>
 
-          <div className="product-detail-actions">
-            <button className="product-detail-btn" onClick={handleAddToCart}>
-              Добавить в корзину
-            </button>
-
-            {isAdmin() && (
-              <Link
-                to={`/admin/products/edit/${product.id}`}
-                className="product-detail-btn product-detail-btn-secondary"
-              >
-                Редактировать
-              </Link>
+            {product.description ? (
+              <p className="product-detail-description">{product.description}</p>
+            ) : (
+              <p className="product-detail-description product-detail-description--muted">
+                Описание для этого товара пока не добавлено.
+              </p>
             )}
+
+            <div className="product-detail-meta">
+              <div className="product-detail-meta__item">
+                <span className="product-detail-meta__label">Цена</span>
+                <span className="product-detail-price">{product.price} ₽</span>
+              </div>
+
+              <div className="product-detail-meta__item">
+                <span className="product-detail-meta__label">Артикул</span>
+                <span className="product-detail-sku">{product.sku}</span>
+              </div>
+            </div>
+
+            <div className="product-detail-actions">
+              <button className="product-detail-btn" onClick={handleAddToCart}>
+                Добавить в корзину
+              </button>
+
+              <Link to="/catalog" className="product-detail-btn product-detail-btn-secondary">
+                Назад в каталог
+              </Link>
+
+              {isAdmin() && (
+                <Link
+                  to={`/admin/products/edit/${product.id}`}
+                  className="product-detail-btn product-detail-btn-secondary"
+                >
+                  Редактировать
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>

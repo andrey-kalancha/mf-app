@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
-import "./Register.css";
 import toast from "react-hot-toast";
+import "./Register.css";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -12,8 +12,6 @@ export default function Register() {
     password: "",
   });
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -25,70 +23,65 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
     setLoading(true);
 
     try {
       await api.post("/auth/register", form);
 
-      setSuccess("Регистрация успешна!");
       toast.success("Регистрация успешна");
-
-      setTimeout(() => {
-        navigate("/login");
-      }, 1000);
+      setTimeout(() => navigate("/login"), 800);
     } catch (err) {
-      console.error("Ошибка регистрации:", err);
-
-      if (err.response?.data?.detail) {
-        setError(
-          Array.isArray(err.response.data.detail)
-            ? "Ошибка валидации"
-            : String(err.response.data.detail)
-        );
-      } else {
-        setError("Не удалось зарегистрироваться");
-      }
+      console.error(err);
+      toast.error("Ошибка регистрации");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="register-page">
-      <form className="register-form" onSubmit={handleSubmit}>
-        <h1>Регистрация</h1>
+    <section className="auth-page">
+      <div className="auth-card">
+        <div className="auth-header">
+          <div className="auth-badge">MF APP</div>
+          <h1>Создание аккаунта</h1>
+          <p>Зарегистрируйтесь, чтобы начать покупки</p>
+        </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="example@mail.com"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Пароль"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
+          <div className="auth-field">
+            <label>Пароль</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Минимум 6 символов"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        {error && <p className="register-error">{error}</p>}
-        {success && <p className="register-success">{success}</p>}
+          <button type="submit" disabled={loading} className="auth-btn">
+            {loading ? "Создаём..." : "Зарегистрироваться"}
+          </button>
+        </form>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Регистрируем..." : "Зарегистрироваться"}
-        </button>
-
-        <p className="register-switch">
-          Уже есть аккаунт? <Link to="/login">Войти</Link>
-        </p>
-      </form>
+        <div className="auth-footer">
+          <span>Уже есть аккаунт?</span>
+          <Link to="/login">Войти</Link>
+        </div>
+      </div>
     </section>
   );
 }

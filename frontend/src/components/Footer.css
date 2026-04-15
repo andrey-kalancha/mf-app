@@ -1,0 +1,136 @@
+.site-footer {
+  margin-top: 80px;
+  background: #012245;
+  color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* контейнер */
+.site-footer__container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 50px 24px 30px;
+}
+
+/* верх */
+.site-footer__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+/* 🔥 логотип */
+.footer-logo {
+  height: 100px;
+  width: auto;
+}
+
+/* контакты справа */
+.site-footer__contact-right {
+  text-align: right;
+}
+
+.site-footer__phone {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.site-footer__address {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* меню */
+.site-footer__menu {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 30px 0;
+  padding: 15px 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.site-footer__menu a {
+  color: #fff;
+  font-weight: 600;
+  position: relative;
+}
+
+/* underline эффект */
+.site-footer__menu a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  background: #8fe7ff;
+  left: 0;
+  bottom: -3px;
+  transition: 0.3s;
+}
+
+.site-footer__menu a:hover::after {
+  width: 100%;
+}
+
+.site-footer__menu a:hover {
+  color: #8fe7ff;
+}
+
+/* нижние блоки */
+.site-footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  margin-top: 30px;
+}
+
+.site-footer__column h4 {
+  color: #8fe7ff;
+  margin-bottom: 10px;
+}
+
+.site-footer__column p,
+.site-footer__column a {
+  display: block;
+  font-size: 14px;
+  opacity: 0.8;
+  color: #fff;
+}
+
+.site-footer__column a:hover {
+  opacity: 1;
+  color: #8fe7ff;
+}
+
+/* соцсети */
+.site-footer__socials {
+  display: flex;
+  gap: 10px;
+}
+
+.site-footer__socials a {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(143, 231, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.site-footer__socials a:hover {
+  background: rgba(143, 231, 255, 0.4);
+}
+
+/* копирайт */
+.site-footer__copyright {
+  text-align: center;
+  margin-top: 30px;
+  opacity: 0.7;
+}

@@ -36,125 +36,125 @@ export default function Header() {
     window.location.reload();
   };
 
+  const profileLetter = user?.email ? user.email[0].toUpperCase() : "U";
+
   return (
     <header className="site-header">
-      <div className="site-header__container">
-        <Link to="/" className="site-logo">
-          MF APP
-        </Link>
+      <div className="site-header__top">
+        <div className="site-header__container site-header__top-inner">
+          <div className="site-header__brand">
+            <Link to="/" className="site-logo">
+              <img
+                src="/logo.png"
+                alt="MF APP"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            </Link>
+          </div>
 
-        <nav className="site-nav">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              isActive ? "site-nav__link active" : "site-nav__link"
-            }
-          >
-            Главная
-          </NavLink>
+          <div className="site-header__contacts">
+            <a href="tel:+77774888854" className="site-header__phone">
+              +7 777 488 88 54
+            </a>
+            <span className="site-header__address">
+              г. Алматы, ул. Ратушного, 78А/1, оф.308
+            </span>
+          </div>
+        </div>
+      </div>
 
-          <NavLink
-            to="/catalog"
-            className={({ isActive }) =>
-              isActive ? "site-nav__link active" : "site-nav__link"
-            }
-          >
-            Каталог
-          </NavLink>
+      <div className="site-header__nav-wrap">
+        <div className="site-header__container site-header__nav-inner">
+          <nav className="site-nav">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? "site-nav__link active" : "site-nav__link"
+              }
+            >
+              Главная
+            </NavLink>
 
-          <NavLink
-            to="/about"
-            className={({ isActive }) =>
-              isActive ? "site-nav__link active" : "site-nav__link"
-            }
-          >
-            О нас
-          </NavLink>
+            <NavLink
+              to="/catalog"
+              className={({ isActive }) =>
+                isActive ? "site-nav__link active" : "site-nav__link"
+              }
+            >
+              Каталог
+            </NavLink>
 
-          <NavLink
-            to="/contacts"
-            className={({ isActive }) =>
-              isActive ? "site-nav__link active" : "site-nav__link"
-            }
-          >
-            Контакты
-          </NavLink>
+            <NavLink
+              to="/about"
+              className={({ isActive }) =>
+                isActive ? "site-nav__link active" : "site-nav__link"
+              }
+            >
+              О компании
+            </NavLink>
 
-          {auth && (
-            <>
-              <NavLink
-                to="/cart"
-                className={({ isActive }) =>
-                  isActive ? "site-nav__link active" : "site-nav__link"
-                }
-              >
-                Корзина {cartCount > 0 ? `(${cartCount})` : ""}
-              </NavLink>
+            <NavLink
+              to="/contacts"
+              className={({ isActive }) =>
+                isActive ? "site-nav__link active" : "site-nav__link"
+              }
+            >
+              Контакты
+            </NavLink>
 
-              <NavLink
-                to="/orders"
-                className={({ isActive }) =>
-                  isActive ? "site-nav__link active" : "site-nav__link"
-                }
-              >
-                Заказы
-              </NavLink>
+            {auth && (
+              <>
+                <NavLink
+                  to="/cart"
+                  className={({ isActive }) =>
+                    isActive ? "site-nav__link active" : "site-nav__link"
+                  }
+                >
+                  🛒кОРЗИНА {cartCount > 0 ? `(${cartCount})` : ""}
+                </NavLink>
 
-              <NavLink
-                to="/profile"
-                className={({ isActive }) =>
-                  isActive ? "site-nav__link active" : "site-nav__link"
-                }
-              >
-                {user?.email ? user.email : "Профиль"}
-              </NavLink>
+                <NavLink
+                  to="/orders"
+                  className={({ isActive }) =>
+                    isActive ? "site-nav__link active" : "site-nav__link"
+                  }
+                >
+                  Заказы
+                </NavLink>
 
-              {admin && (
-                <>
+                {admin && (
                   <NavLink
-                    to="/admin/products/create"
-                    className={({ isActive }) =>
-                      isActive ? "site-nav__link active" : "site-nav__link"
-                    }
-                  >
-                    Добавить товар
-                  </NavLink>
-
-                  <NavLink
-                    to="/admin/categories/create"
-                    className={({ isActive }) =>
-                      isActive ? "site-nav__link active" : "site-nav__link"
-                    }
-                  >
-                    Добавить категорию
-                  </NavLink>
-                  <NavLink
-                   to="/admin"
+                    to="/admin"
                     className={({ isActive }) =>
                       isActive ? "site-nav__link active" : "site-nav__link"
                     }
                   >
                     Админка
                   </NavLink>
-                  <NavLink
-                  to="/admin/orders"
-                  className={({ isActive }) =>
-                    isActive ? "site-nav__link active" : "site-nav__link"
-                  }
-                >
-                  Все заказы
-                </NavLink>
-                </>
-              )}
-            </>
-          )}
+                )}
+              </>
+            )}
+          </nav>
 
-          {auth ? (
-            <button className="site-nav__logout" onClick={handleLogout}>
-              Выйти
-            </button>
-          ) : (
-            <>
+          <div className="site-header__actions">
+            {auth ? (
+              <>
+                <NavLink to="/profile" className="site-profile-chip">
+                  <span className="site-profile-chip__avatar">
+                    {profileLetter}
+                  </span>
+                  <span className="site-profile-chip__text">
+                    {user?.email || "Профиль"}
+                  </span>
+                </NavLink>
+
+                <button className="site-nav__logout" onClick={handleLogout}>
+                  Выйти
+                </button>
+              </>
+            ) : (
               <NavLink
                 to="/login"
                 className={({ isActive }) =>
@@ -163,18 +163,9 @@ export default function Header() {
               >
                 Вход
               </NavLink>
-
-              <NavLink
-                to="/register"
-                className={({ isActive }) =>
-                  isActive ? "site-nav__link active" : "site-nav__link"
-                }
-              >
-                Регистрация
-              </NavLink>
-            </>
-          )}
-        </nav>
+            )}
+          </div>
+        </div>
       </div>
     </header>
   );

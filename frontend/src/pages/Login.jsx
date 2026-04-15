@@ -13,7 +13,6 @@ export default function Login() {
     password: "",
   });
 
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -25,7 +24,6 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -50,46 +48,57 @@ export default function Login() {
       navigate("/catalog");
       window.location.reload();
     } catch (err) {
-      console.error("Ошибка логина:", err);
-      setError("Неверный логин или пароль");
+      console.error(err);
+      toast.error("Неверный логин или пароль");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="login-page">
-      <form className="login-form" onSubmit={handleSubmit}>
-        <h1>Вход</h1>
+    <section className="auth-page">
+      <div className="auth-card">
+        <div className="auth-header">
+          <div className="auth-badge">MF APP</div>
+          <h1>Вход в аккаунт</h1>
+          <p>Введите данные, чтобы продолжить</p>
+        </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="example@mail.com"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Пароль"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
+          <div className="auth-field">
+            <label>Пароль</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Введите пароль"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        {error && <p className="login-error">{error}</p>}
+          <button type="submit" disabled={loading} className="auth-btn">
+            {loading ? "Входим..." : "Войти"}
+          </button>
+        </form>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Входим..." : "Войти"}
-        </button>
-
-        <p className="login-switch">
-          Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
-        </p>
-      </form>
+        <div className="auth-footer">
+          <span>Нет аккаунта?</span>
+          <Link to="/register">Зарегистрироваться</Link>
+        </div>
+      </div>
     </section>
   );
 }

@@ -8,7 +8,6 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
 
   const [email, setEmail] = useState("");
-
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
@@ -33,10 +32,7 @@ export default function Profile() {
     e.preventDefault();
 
     try {
-      await api.put("/profile", {
-        email,
-      });
-
+      await api.put("/profile", { email });
       toast.success("Профиль обновлен");
       loadProfile();
     } catch (err) {
@@ -60,7 +56,6 @@ export default function Profile() {
       });
 
       toast.success("Пароль изменен");
-
       setCurrentPassword("");
       setNewPassword("");
     } catch (err) {
@@ -70,17 +65,27 @@ export default function Profile() {
   };
 
   if (loading) {
-    return <h1 className="profile-title">Загрузка...</h1>;
+    return <h1 className="profile-page__title">Загрузка...</h1>;
   }
+
+  const profileLetter = profile?.email ? profile.email[0].toUpperCase() : "U";
 
   return (
     <section className="profile-page">
-      <h1 className="profile-title">Профиль</h1>
+      <div className="profile-page__header">
+        <div className="profile-page__avatar">{profileLetter}</div>
 
-      <div className="profile-grid">
-        {/* ОБНОВЛЕНИЕ ПРОФИЛЯ */}
+        <div>
+          <h1 className="profile-page__title">Профиль</h1>
+          <p className="profile-page__subtitle">
+            Управление данными аккаунта и безопасностью
+          </p>
+        </div>
+      </div>
+
+      <div className="profile-page__grid">
         <form className="profile-card" onSubmit={handleUpdateProfile}>
-          <h2>Данные</h2>
+          <h2>Основные данные</h2>
 
           <label>Email</label>
           <input
@@ -89,12 +94,16 @@ export default function Profile() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
+          <div className="profile-card__meta">
+            <span>ID: {profile?.id ?? "—"}</span>
+            <span>Роль: {profile?.role || "user"}</span>
+          </div>
+
           <button type="submit" className="profile-btn">
-            Сохранить
+            Сохранить изменения
           </button>
         </form>
 
-        {/* СМЕНА ПАРОЛЯ */}
         <form className="profile-card" onSubmit={handleChangePassword}>
           <h2>Смена пароля</h2>
 
@@ -113,7 +122,7 @@ export default function Profile() {
           />
 
           <button type="submit" className="profile-btn">
-            Изменить пароль
+            Обновить пароль
           </button>
         </form>
       </div>

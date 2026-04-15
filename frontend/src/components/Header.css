@@ -1,78 +1,189 @@
 .site-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(10, 14, 28, 0.9);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid #1f2638;
+  background: #012245;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .site-header__container {
-  max-width: 1280px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 18px 24px;
+  padding: 0 24px;
+}
+
+.site-header__top {
+  padding: 26px 0 18px;
+}
+
+.site-header__top-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
 }
 
-.site-logo {
+.site-logo img {
+  height: 160px;
+  width: auto;
+  object-fit: contain;
+}
+
+.site-header__contacts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  text-align: right;
+}
+
+.site-header__phone {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  display: block;
+  margin: 0;
+  text-decoration: none;
+}
+
+.site-header__phone:hover,
+.site-header__phone:focus,
+.site-header__phone:active,
+.site-header__phone:visited {
   color: #ffffff;
   text-decoration: none;
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
 }
 
-.site-logo:hover {
-  text-decoration: none;
+.site-header__address {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.site-header__nav-wrap {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.site-header__nav-inner {
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .site-nav {
   display: flex;
-  gap: 24px;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
 }
 
 .site-nav__link {
-  color: #b8c0cf;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 600;
-  transition: color 0.2s ease;
-}
-
-.site-nav__link:hover {
   color: #ffffff;
   text-decoration: none;
+  font-weight: 600;
+  position: relative;
+  transition: 0.2s;
+  white-space: nowrap;
 }
 
+.site-nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 0;
+  height: 2px;
+  background: #8fe7ff;
+  transition: 0.25s ease;
+}
+
+.site-nav__link:hover::after,
+.site-nav__link.active::after {
+  width: 100%;
+}
+
+.site-nav__link:hover,
 .site-nav__link.active {
-  color: #7b6dff;
+  color: #8fe7ff;
 }
 
-@media (max-width: 700px) {
-  .site-header__container {
-    flex-direction: column;
-    gap: 14px;
-  }
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 
-  .site-nav {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-  }
+.site-profile-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  text-decoration: none;
+  max-width: 260px;
+}
+
+.site-profile-chip:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.site-profile-chip__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #8fe7ff;
+  color: #012245;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.site-profile-chip__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
 }
 
 .site-nav__logout {
-  border: none;
   background: transparent;
-  color: #b8c0cf;
-  font-size: 16px;
-  font-weight: 600;
+  border: none;
+  color: #ffffff;
   cursor: pointer;
-  transition: color 0.2s ease;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .site-nav__logout:hover {
-  color: #ffffff;
+  color: #8fe7ff;
+}
+
+@media (max-width: 1100px) {
+  .site-header__top-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-header__contacts {
+    text-align: left;
+  }
+
+  .site-header__nav-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 24px;
+  }
+
+  .site-nav {
+    justify-content: flex-start;
+  }
+
+  .site-header__actions {
+    width: 100%;
+    justify-content: space-between;
+  }
 }

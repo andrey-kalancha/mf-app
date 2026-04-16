@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getCurrentUser,
   isAdmin,
@@ -14,7 +14,11 @@ export default function Header() {
   const auth = isAuthenticated();
   const admin = isAdmin();
   const user = getCurrentUser();
+
   const [cartCount, setCartCount] = useState(0);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const profileRef = useRef(null);
 
   useEffect(() => {
     const loadCartCount = async () => {
@@ -23,17 +27,41 @@ export default function Header() {
         return;
       }
 
-      const count = await getCartCount();
-      setCartCount(count);
+      try {
+        const count = await getCartCount();
+        setCartCount(count);
+      } catch (error) {
+        console.error("Ошибка загрузки количества корзины:", error);
+        setCartCount(0);
+      }
     };
 
     loadCartCount();
   }, [auth]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleLogout = () => {
+    setProfileOpen(false);
     removeToken();
     navigate("/");
     window.location.reload();
+  };
+
+  const closeProfileMenu = () => {
+    setProfileOpen(false);
   };
 
   const profileLetter = user?.email ? user.email[0].toUpperCase() : "U";
@@ -103,56 +131,128 @@ export default function Header() {
             >
               Контакты
             </NavLink>
-
-            {auth && (
-              <>
-                <NavLink
-                  to="/cart"
-                  className={({ isActive }) =>
-                    isActive ? "site-nav__link active" : "site-nav__link"
-                  }
-                >
-                  🛒кОРЗИНА {cartCount > 0 ? `(${cartCount})` : ""}
-                </NavLink>
-
-                <NavLink
-                  to="/orders"
-                  className={({ isActive }) =>
-                    isActive ? "site-nav__link active" : "site-nav__link"
-                  }
-                >
-                  Заказы
-                </NavLink>
-
-                {admin && (
-                  <NavLink
-                    to="/admin"
-                    className={({ isActive }) =>
-                      isActive ? "site-nav__link active" : "site-nav__link"
-                    }
-                  >
-                    Админка
-                  </NavLink>
-                )}
-              </>
-            )}
           </nav>
 
           <div className="site-header__actions">
             {auth ? (
               <>
-                <NavLink to="/profile" className="site-profile-chip">
-                  <span className="site-profile-chip__avatar">
-                    {profileLetter}
+                <NavLink
+                  to="/cart"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "site-cart-btn site-cart-btn--active"
+                      : "site-cart-btn"
+                  }
+                  aria-label="Корзина"
+                >
+                  <span className="site-cart-btn__icon" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 4H5L7.2 14.2C7.3 14.7 7.75 15 8.25 15H17.6C18.08 15 18.5 14.68 18.63 14.21L20.4 8H6.1"
+                        stroke="currentColor"
+                        strokeWidth="1.9"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <circle cx="9" cy="19" r="1.6" fill="currentColor" />
+                      <circle cx="17" cy="19" r="1.6" fill="currentColor" />
+                    </svg>
                   </span>
-                  <span className="site-profile-chip__text">
-                    {user?.email || "Профиль"}
-                  </span>
+
+                  <span className="site-cart-btn__text">Корзина</span>
+
+                  {cartCount > 0 && (
+                    <span className="site-cart-btn__count">{cartCount}</span>
+                  )}
                 </NavLink>
 
-                <button className="site-nav__logout" onClick={handleLogout}>
-                  Выйти
-                </button>
+                <div className="site-profile-dropdown" ref={profileRef}>
+                  <button
+                    type="button"
+                    className={`site-profile-chip ${
+                      profileOpen ? "site-profile-chip--open" : ""
+                    }`}
+                    onClick={() => setProfileOpen((prev) => !prev)}
+                    aria-expanded={profileOpen}
+                    aria-haspopup="menu"
+                  >
+                    <span className="site-profile-chip__avatar">
+                      {profileLetter}
+                    </span>
+
+                    <span className="site-profile-chip__text">
+                      {user?.email || "Профиль"}
+                    </span>
+
+                    <span
+                      className={`site-profile-chip__arrow ${
+                        profileOpen ? "open" : ""
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <svg
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M5 7.5L10 12.5L15 7.5"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+
+                  {profileOpen && (
+                    <div className="site-profile-menu" role="menu">
+                      <div className="site-profile-menu__header">
+                        <span className="site-profile-menu__label">Аккаунт</span>
+                        <strong>{user?.email || "Пользователь"}</strong>
+                      </div>
+
+                      <NavLink
+                        to="/profile"
+                        className="site-profile-menu__item"
+                        onClick={closeProfileMenu}
+                      >
+                        Профиль
+                      </NavLink>
+
+                      <NavLink
+                        to="/orders"
+                        className="site-profile-menu__item"
+                        onClick={closeProfileMenu}
+                      >
+                        Мои заказы
+                      </NavLink>
+
+                      {admin && (
+                        <NavLink
+                          to="/admin"
+                          className="site-profile-menu__item"
+                          onClick={closeProfileMenu}
+                        >
+                          Админка
+                        </NavLink>
+                      )}
+
+                      <button
+                        type="button"
+                        className="site-profile-menu__item site-profile-menu__item--danger"
+                        onClick={handleLogout}
+                      >
+                        Выйти
+                      </button>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <NavLink

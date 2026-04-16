@@ -4,7 +4,6 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-
   background:
     radial-gradient(circle at top left, rgba(143, 231, 255, 0.08), transparent 30%),
     radial-gradient(circle at bottom right, rgba(91, 92, 240, 0.12), transparent 30%),
@@ -13,13 +12,11 @@
 
 .auth-card {
   width: 100%;
-  max-width: 440px;
+  max-width: 520px;
   padding: 36px;
   border-radius: 24px;
-
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   backdrop-filter: blur(10px);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
@@ -58,6 +55,12 @@
   gap: 16px;
 }
 
+.auth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
 .auth-field {
   display: flex;
   flex-direction: column;
@@ -84,19 +87,29 @@
   box-shadow: 0 0 0 2px rgba(143, 231, 255, 0.2);
 }
 
+.auth-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.auth-checkbox input {
+  margin-top: 2px;
+}
+
 .auth-btn {
   margin-top: 6px;
   padding: 14px;
   border-radius: 12px;
   border: none;
-
   background: linear-gradient(135deg, #5b5cf0, #4b4ce0);
   color: #fff;
-
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-
   transition: 0.2s;
 }
 
@@ -124,4 +137,14 @@
 
 .auth-footer a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 24px;
+  }
+
+  .auth-row {
+    grid-template-columns: 1fr;
+  }
 }

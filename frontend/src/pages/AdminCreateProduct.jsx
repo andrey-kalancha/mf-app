@@ -3,13 +3,10 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import "./AdminCreateProduct.css";
+import AdminNav from "../components/AdminNav";
 
 export default function AdminCreateProduct() {
   const navigate = useNavigate();
-
-  const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -19,9 +16,14 @@ export default function AdminCreateProduct() {
     category_id: "",
   });
 
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     const loadCategories = async () => {
       try {
+        setLoadingCategories(true);
         const response = await api.get("/categories");
         setCategories(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
@@ -45,96 +47,126 @@ export default function AdminCreateProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.category_id) {
-      toast.error("Выберите категорию");
+    if (!form.name.trim() || !form.sku.trim() || !form.price || !form.category_id) {
+      toast.error("Заполните обязательные поля");
       return;
     }
 
     try {
-      setSubmitting(true);
+      setSaving(true);
 
-      const payload = {
-        name: form.name,
-        description: form.description,
+      await api.post("/products", {
+        name: form.name.trim(),
+        description: form.description.trim(),
         price: Number(form.price),
-        sku: form.sku,
+        sku: form.sku.trim(),
         category_id: Number(form.category_id),
-      };
+      });
 
-      const response = await api.post("/products", payload);
-
-      toast.success("Товар успешно создан");
-      navigate(`/product/${response.data.id}`);
+      toast.success("Товар создан");
+      navigate("/admin");
     } catch (err) {
       console.error("Ошибка создания товара:", err);
       toast.error("Не удалось создать товар");
     } finally {
-      setSubmitting(false);
+      setSaving(false);
     }
   };
 
   return (
     <section className="admin-product-page">
-      <div className="admin-product-card">
-        <h1>Добавить товар</h1>
+      <div className="admin-product-shell">
+        <div className="admin-product-heading">
+          <div className="admin-product-badge">Admin panel</div>
+          <h1 className="admin-product-title">Создание товара</h1>
+          <p className="admin-product-subtitle">
+            Добавьте новый товар в каталог
+          </p>
+        </div>
 
-        <form className="admin-product-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Название товара"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
+        <AdminNav />
 
-          <textarea
-            name="description"
-            placeholder="Описание товара"
-            value={form.description}
-            onChange={handleChange}
-            rows="5"
-          />
+        <div className="admin-product-card">
+          <form className="admin-product-form" onSubmit={handleSubmit}>
+            <div className="admin-product-field">
+              <label htmlFor="product-name">Название</label>
+              <input
+                id="product-name"
+                name="name"
+                type="text"
+                placeholder="Название товара"
+                value={form.name}
+                onChange={handleChange}
+                disabled={saving}
+              />
+            </div>
 
-          <input
-            type="number"
-            name="price"
-            placeholder="Цена"
-            value={form.price}
-            onChange={handleChange}
-            required
-            min="0"
-            step="0.01"
-          />
+            <div className="admin-product-field">
+              <label htmlFor="product-description">Описание</label>
+              <textarea
+                id="product-description"
+                name="description"
+                rows="5"
+                placeholder="Описание товара"
+                value={form.description}
+                onChange={handleChange}
+                disabled={saving}
+              />
+            </div>
 
-          <input
-            type="text"
-            name="sku"
-            placeholder="Артикул"
-            value={form.sku}
-            onChange={handleChange}
-            required
-          />
+            <div className="admin-product-grid">
+              <div className="admin-product-field">
+                <label htmlFor="product-price">Цена</label>
+                <input
+                  id="product-price"
+                  name="price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Цена"
+                  value={form.price}
+                  onChange={handleChange}
+                  disabled={saving}
+                />
+              </div>
 
-          <select
-            name="category_id"
-            value={form.category_id}
-            onChange={handleChange}
-            required
-            disabled={loadingCategories}
-          >
-            <option value="">Выберите категорию</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+              <div className="admin-product-field">
+                <label htmlFor="product-sku">SKU</label>
+                <input
+                  id="product-sku"
+                  name="sku"
+                  type="text"
+                  placeholder="Артикул"
+                  value={form.sku}
+                  onChange={handleChange}
+                  disabled={saving}
+                />
+              </div>
+            </div>
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? "Создаем..." : "Создать товар"}
-          </button>
-        </form>
+            <div className="admin-product-field">
+              <label htmlFor="product-category">Категория</label>
+              <select
+                id="product-category"
+                name="category_id"
+                value={form.category_id}
+                onChange={handleChange}
+                disabled={saving || loadingCategories}
+              >
+                <option value="">Выберите категорию</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button type="submit" disabled={saving || loadingCategories}>
+              {saving ? "Создаём..." : "Создать товар"}
+            </button>
+          </form>
+        </div>
       </div>
     </section>
   );

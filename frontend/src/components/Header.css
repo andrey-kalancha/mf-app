@@ -1,6 +1,8 @@
 .site-header {
   background: #012245;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 50;
 }
 
 .site-header__container {
@@ -111,6 +113,67 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  position: relative;
+}
+
+/* корзина */
+.site-cart-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.site-cart-btn:hover,
+.site-cart-btn--active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #8fe7ff;
+}
+
+.site-cart-btn__icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.site-cart-btn__icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.site-cart-btn__text {
+  white-space: nowrap;
+}
+
+.site-cart-btn__count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #8fe7ff;
+  color: #012245;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* профиль */
+.site-profile-dropdown {
+  position: relative;
 }
 
 .site-profile-chip {
@@ -122,10 +185,14 @@
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   text-decoration: none;
-  max-width: 260px;
+  max-width: 280px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.site-profile-chip:hover {
+.site-profile-chip:hover,
+.site-profile-chip--open {
   background: rgba(255, 255, 255, 0.14);
 }
 
@@ -147,19 +214,92 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 600;
+  max-width: 160px;
 }
 
-.site-nav__logout {
+.site-profile-chip__arrow {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.72);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.site-profile-chip__arrow svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.site-profile-chip__arrow.open {
+  transform: rotate(180deg);
+}
+
+.site-profile-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 260px;
+  padding: 12px;
+  border-radius: 18px;
+  background: #031f3b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 100;
+}
+
+.site-profile-menu__header {
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 4px;
+}
+
+.site-profile-menu__label {
+  display: block;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.site-profile-menu__header strong {
+  color: #ffffff;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.site-profile-menu__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
   background: transparent;
   border: none;
   color: #ffffff;
-  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
   font-weight: 600;
-  white-space: nowrap;
+  cursor: pointer;
+  transition: 0.2s ease;
+  text-align: left;
 }
 
-.site-nav__logout:hover {
+.site-profile-menu__item:hover {
+  background: rgba(255, 255, 255, 0.08);
   color: #8fe7ff;
+}
+
+.site-profile-menu__item--danger:hover {
+  color: #ff8d8d;
 }
 
 @media (max-width: 1100px) {
@@ -170,6 +310,7 @@
 
   .site-header__contacts {
     text-align: left;
+    align-items: flex-start;
   }
 
   .site-header__nav-inner {
@@ -185,5 +326,37 @@
   .site-header__actions {
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .site-profile-menu {
+    right: auto;
+    left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-logo img {
+    height: 120px;
+  }
+
+  .site-nav {
+    gap: 18px;
+  }
+
+  .site-cart-btn__text {
+    display: none;
+  }
+
+  .site-profile-chip {
+    max-width: 220px;
+  }
+
+  .site-profile-chip__text {
+    max-width: 110px;
+  }
+
+  .site-profile-menu {
+    width: 220px;
   }
 }

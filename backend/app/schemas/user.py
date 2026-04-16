@@ -4,7 +4,8 @@ from pydantic import BaseModel, EmailStr
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
-
+    first_name: str
+    last_name: str
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -13,6 +14,8 @@ class UserLogin(BaseModel):
 
 class UserUpdate(BaseModel):
     email: EmailStr
+    first_name: str
+    last_name: str
 
 
 class UserPasswordUpdate(BaseModel):
@@ -31,6 +34,8 @@ class UserActiveUpdate(BaseModel):
 class UserOut(BaseModel):
     id: int
     email: EmailStr
+    first_name: str | None = None
+    last_name: str | None = None
     role: str
     is_active: bool
 
@@ -40,3 +45,4 @@ class UserOut(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+

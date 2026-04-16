@@ -1,74 +1,139 @@
 .admin-category-page {
-  max-width: 700px;
+  background:
+    radial-gradient(circle at top left, rgba(143, 231, 255, 0.08), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(91, 92, 240, 0.12), transparent 32%),
+    #012245;
+  min-height: calc(100vh - 120px);
+  padding: 44px 24px 80px;
+}
+
+.admin-category-shell {
+  max-width: 820px;
   margin: 0 auto;
-  padding: 50px 24px 80px;
+}
+
+.admin-category-heading {
+  margin-bottom: 28px;
+}
+
+.admin-category-badge {
+  display: inline-flex;
+  margin-bottom: 16px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(143, 231, 255, 0.1);
+  border: 1px solid rgba(143, 231, 255, 0.14);
+  color: #8fe7ff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-category-title {
+  margin: 0 0 10px;
+  color: #ffffff;
+  font-size: clamp(34px, 4vw, 54px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.admin-category-subtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 17px;
+  line-height: 1.6;
 }
 
 .admin-category-card {
-  background: #151925;
-  border: 1px solid #2b3245;
-  border-radius: 24px;
-  padding: 32px;
-}
-
-.admin-category-card h1 {
-  margin: 0 0 24px;
-  color: #fff;
-  font-size: 42px;
-  text-align: center;
+  padding: 30px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
 }
 
 .admin-category-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
+}
+
+.admin-category-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-category-field label {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .admin-category-form input {
-  padding: 14px 16px;
-  border: 1px solid #2b3245;
-  border-radius: 12px;
-  background: #0f1320;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.22);
   color: #fff;
   font-size: 16px;
   outline: none;
 }
 
 .admin-category-form input:focus {
-  border-color: #6c63ff;
-  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+  border-color: #8fe7ff;
+  box-shadow: 0 0 0 3px rgba(143, 231, 255, 0.14);
 }
 
 .admin-category-form button {
-  padding: 14px 16px;
+  min-height: 52px;
+  padding: 0 18px;
   border: none;
-  border-radius: 12px;
-  background: #6c63ff;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #5b5cf0, #4b4ce0);
   color: #fff;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+  box-shadow: 0 14px 30px rgba(91, 92, 240, 0.25);
 }
 
 .admin-category-form button:hover {
-  background: #584ff0;
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #6768ff, #5455eb);
+  box-shadow: 0 18px 34px rgba(91, 92, 240, 0.32);
 }
 
 .admin-category-form button:disabled {
-  opacity: 0.7;
+  opacity: 0.68;
   cursor: not-allowed;
+  transform: none;
 }
+
 .admin-category-delete-btn {
-  padding: 14px 16px;
-  border: none;
-  border-radius: 12px;
-  background: #2c3448;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
+  background: rgba(255, 107, 107, 0.18) !important;
+  color: #ffd4d4 !important;
+  box-shadow: none !important;
 }
 
 .admin-category-delete-btn:hover {
-  background: #3a445d;
+  background: rgba(255, 107, 107, 0.26) !important;
+}
+
+@media (max-width: 720px) {
+  .admin-category-page {
+    padding: 28px 16px 56px;
+  }
+
+  .admin-category-card {
+    padding: 20px;
+  }
 }

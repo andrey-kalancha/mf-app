@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import "./AdminCreateCategory.css";
+import AdminNav from "../components/AdminNav";
 
 export default function AdminEditCategory() {
   const { id } = useParams();
@@ -10,22 +11,15 @@ export default function AdminEditCategory() {
 
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const loadCategory = async () => {
       try {
-        const response = await api.get("/categories");
-        const categories = Array.isArray(response.data) ? response.data : [];
-        const category = categories.find((item) => String(item.id) === String(id));
-
-        if (!category) {
-          toast.error("Категория не найдена");
-          navigate("/catalog");
-          return;
-        }
-
-        setName(category.name || "");
+        setLoading(true);
+        const response = await api.get(`/categories/${id}`);
+        setName(response.data?.name || "");
       } catch (err) {
         console.error("Ошибка загрузки категории:", err);
         toast.error("Не удалось загрузить категорию");
@@ -35,7 +29,7 @@ export default function AdminEditCategory() {
     };
 
     loadCategory();
-  }, [id, navigate]);
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,66 +40,88 @@ export default function AdminEditCategory() {
     }
 
     try {
-      setSubmitting(true);
-
-      await api.put(`/categories/${id}`, {
-        name: name.trim(),
-      });
-
-      toast.success("Категория успешно обновлена");
-      navigate("/catalog");
+      setSaving(true);
+      await api.put(`/categories/${id}`, { name: name.trim() });
+      toast.success("Категория обновлена");
+      navigate("/admin");
     } catch (err) {
       console.error("Ошибка обновления категории:", err);
       toast.error("Не удалось обновить категорию");
     } finally {
-      setSubmitting(false);
+      setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    const confirmed = window.confirm("Удалить эту категорию?");
+    const confirmed = window.confirm("Удалить категорию?");
     if (!confirmed) return;
 
     try {
+      setDeleting(true);
       await api.delete(`/categories/${id}`);
       toast.success("Категория удалена");
-      navigate("/catalog");
+      navigate("/admin");
     } catch (err) {
       console.error("Ошибка удаления категории:", err);
       toast.error("Не удалось удалить категорию");
+    } finally {
+      setDeleting(false);
     }
   };
 
   if (loading) {
-    return <h1 className="catalog-title">Загрузка...</h1>;
+    return (
+      <section className="admin-category-page">
+        <div className="admin-category-shell">
+          <div className="admin-category-card">
+            <h1 className="admin-category-title">Загрузка...</h1>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
     <section className="admin-category-page">
-      <div className="admin-category-card">
-        <h1>Редактировать категорию</h1>
+      <div className="admin-category-shell">
+        <div className="admin-category-heading">
+          <div className="admin-category-badge">Admin panel</div>
+          <h1 className="admin-category-title">Редактирование категории</h1>
+          <p className="admin-category-subtitle">
+            Измените данные категории или удалите её
+          </p>
+        </div>
 
-        <form className="admin-category-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Название категории"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+        <AdminNav />
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? "Сохраняем..." : "Сохранить изменения"}
-          </button>
+        <div className="admin-category-card">
+          <form className="admin-category-form" onSubmit={handleSubmit}>
+            <div className="admin-category-field">
+              <label htmlFor="category-name">Название категории</label>
+              <input
+                id="category-name"
+                type="text"
+                placeholder="Название категории"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={saving || deleting}
+              />
+            </div>
 
-          <button
-            type="button"
-            className="admin-category-delete-btn"
-            onClick={handleDelete}
-          >
-            Удалить категорию
-          </button>
-        </form>
+            <button type="submit" disabled={saving || deleting}>
+              {saving ? "Сохраняем..." : "Сохранить изменения"}
+            </button>
+
+            <button
+              type="button"
+              className="admin-category-delete-btn"
+              onClick={handleDelete}
+              disabled={saving || deleting}
+            >
+              {deleting ? "Удаляем..." : "Удалить категорию"}
+            </button>
+          </form>
+        </div>
       </div>
     </section>
   );

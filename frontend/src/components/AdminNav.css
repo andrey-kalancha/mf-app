@@ -1,0 +1,28 @@
+.admin-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 24px;
+}
+
+.admin-nav__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.admin-nav__link:hover,
+.admin-nav__link.active {
+  background: linear-gradient(135deg, #5b5cf0, #4b4ce0);
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(91, 92, 240, 0.26);
+}

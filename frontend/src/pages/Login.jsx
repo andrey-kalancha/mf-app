@@ -59,7 +59,6 @@ export default function Login() {
     <section className="auth-page">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-badge">MF APP</div>
           <h1>Вход в аккаунт</h1>
           <p>Введите данные, чтобы продолжить</p>
         </div>

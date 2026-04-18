@@ -35,6 +35,9 @@ def update_profile(
         )
 
     current_user.email = user_in.email
+    current_user.first_name = user_in.first_name
+    current_user.last_name = user_in.last_name
+
     db.commit()
     db.refresh(current_user)
     return current_user

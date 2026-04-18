@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
-import { setCurrentUser, setToken } from "../services/auth";
 import toast from "react-hot-toast";
+import { setToken } from "../services/auth";
 import "./Login.css";
 
 export default function Login() {
@@ -24,13 +24,13 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
+      setLoading(true);
+
       const params = new URLSearchParams();
       params.append("username", form.email);
       params.append("password", form.password);
-      params.append("grant_type", "password");
 
       const response = await api.post("/auth/login", params, {
         headers: {
@@ -38,18 +38,13 @@ export default function Login() {
         },
       });
 
-      const token = response.data.access_token;
-      setToken(token);
-
-      const meResponse = await api.get("/auth/me");
-      setCurrentUser(meResponse.data);
-
+      saveToken(response.data.access_token);
       toast.success("Вы успешно вошли");
-      navigate("/catalog");
+      navigate("/");
       window.location.reload();
     } catch (err) {
-      console.error(err);
-      toast.error("Неверный логин или пароль");
+      console.error("Ошибка входа:", err);
+      toast.error(err.response?.data?.detail || "Ошибка входа");
     } finally {
       setLoading(false);
     }
@@ -60,7 +55,7 @@ export default function Login() {
       <div className="auth-card">
         <div className="auth-header">
           <h1>Вход в аккаунт</h1>
-          <p>Введите данные, чтобы продолжить</p>
+          <p>Введите email и пароль для входа</p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
@@ -86,6 +81,12 @@ export default function Login() {
               onChange={handleChange}
               required
             />
+          </div>
+
+          <div className="auth-links">
+            <Link to="/forgot-password" className="auth-link">
+              Забыли пароль?
+            </Link>
           </div>
 
           <button type="submit" disabled={loading} className="auth-btn">

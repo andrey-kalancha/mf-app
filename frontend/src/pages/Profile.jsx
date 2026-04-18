@@ -62,7 +62,9 @@ export default function Profile() {
   const fullName = useMemo(() => {
     const first = profileForm.first_name?.trim() || "";
     const last = profileForm.last_name?.trim() || "";
-    return `${first} ${last}`.trim() || "Пользователь";
+    const name = `${first} ${last}`.trim();
+
+    return name || "Личный кабинет";
   }, [profileForm]);
 
   const handleProfileChange = (e) => {
@@ -181,16 +183,16 @@ export default function Profile() {
           <div className="profile-avatar">{initials}</div>
 
           <div className="profile-hero__content">
-           
             <h1 className="profile-title">{fullName}</h1>
             <p className="profile-subtitle">
               Управление данными аккаунта и безопасностью
             </p>
 
             <div className="profile-meta">
-              <span>{profileForm.email}</span>
-              <span className="profile-role-badge">
-                {profile?.role || "client"}
+              <span className="profile-meta__email">{profileForm.email}</span>
+              <span className="profile-chip">{profile?.role || "client"}</span>
+              <span className="profile-chip">
+                {profile?.is_active ? "Активен" : "Неактивен"}
               </span>
             </div>
           </div>
@@ -200,7 +202,7 @@ export default function Profile() {
           <div className="profile-card">
             <div className="profile-card__header">
               <h2>Основные данные</h2>
-              <p>Измените личную информацию аккаунта</p>
+              <p>Обновите личную информацию аккаунта</p>
             </div>
 
             <form className="profile-form" onSubmit={handleProfileSubmit}>
@@ -211,6 +213,7 @@ export default function Profile() {
                     id="first_name"
                     name="first_name"
                     type="text"
+                    placeholder="Введите имя"
                     value={profileForm.first_name}
                     onChange={handleProfileChange}
                     disabled={savingProfile}
@@ -224,6 +227,7 @@ export default function Profile() {
                     id="last_name"
                     name="last_name"
                     type="text"
+                    placeholder="Введите фамилию"
                     value={profileForm.last_name}
                     onChange={handleProfileChange}
                     disabled={savingProfile}
@@ -238,6 +242,7 @@ export default function Profile() {
                   id="email"
                   name="email"
                   type="email"
+                  placeholder="example@mail.com"
                   value={profileForm.email}
                   onChange={handleProfileChange}
                   disabled={savingProfile}
@@ -245,12 +250,21 @@ export default function Profile() {
                 />
               </div>
 
-              <div className="profile-info">
-                <span>ID: {profile?.id}</span>
-                <span>Роль: {profile?.role}</span>
-                <span>
-                  Статус: {profile?.is_active ? "Активен" : "Неактивен"}
-                </span>
+              <div className="profile-stats">
+                <div className="profile-stat">
+                  <span>ID</span>
+                  <strong>{profile?.id ?? "—"}</strong>
+                </div>
+
+                <div className="profile-stat">
+                  <span>Роль</span>
+                  <strong>{profile?.role ?? "client"}</strong>
+                </div>
+
+                <div className="profile-stat">
+                  <span>Статус</span>
+                  <strong>{profile?.is_active ? "Активен" : "Неактивен"}</strong>
+                </div>
               </div>
 
               <button
@@ -276,6 +290,7 @@ export default function Profile() {
                   id="current_password"
                   name="current_password"
                   type="password"
+                  placeholder="Введите текущий пароль"
                   value={passwordForm.current_password}
                   onChange={handlePasswordChange}
                   disabled={savingPassword}
@@ -289,6 +304,7 @@ export default function Profile() {
                   id="new_password"
                   name="new_password"
                   type="password"
+                  placeholder="Введите новый пароль"
                   value={passwordForm.new_password}
                   onChange={handlePasswordChange}
                   disabled={savingPassword}

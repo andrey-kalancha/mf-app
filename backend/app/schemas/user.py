@@ -14,8 +14,8 @@ class UserLogin(BaseModel):
 
 class UserUpdate(BaseModel):
     email: EmailStr
-    first_name: str
-    last_name: str
+    first_name: str | None = None
+    last_name: str | None = None
 
 
 class UserPasswordUpdate(BaseModel):

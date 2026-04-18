@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Orders from "./pages/Orders";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
 import AdminCreateProduct from "./pages/AdminCreateProduct";
 import AdminCreateCategory from "./pages/AdminCreateCategory";
 import AdminEditProduct from "./pages/AdminEditProduct";
@@ -32,6 +33,7 @@ function App() {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           <Route
             path="/cart"

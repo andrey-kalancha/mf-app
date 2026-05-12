@@ -231,6 +231,36 @@
 .admin-order-items {
   display: flex;
   flex-direction: column;
+  gap: 14px;
+}
+
+.admin-order-delivery {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(143, 231, 255, 0.08);
+  border: 1px solid rgba(143, 231, 255, 0.14);
+}
+
+.admin-order-delivery span {
+  display: block;
+  margin-bottom: 6px;
+  color: #8fe7ff;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-order-delivery strong {
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.admin-order-delivery p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 14px;
 }
 
 .admin-order-item {

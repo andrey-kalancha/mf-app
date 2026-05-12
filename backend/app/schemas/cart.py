@@ -14,13 +14,16 @@ class CartItemOut(BaseModel):
     id: int
     product_id: int
     quantity: int
+    unit_price: float
+    base_price: float
+    total_price: float
+    price_source: str
+    applied_price_list_id: int | None = None
 
-    model_config = {"from_attributes": True}
 
 
 class CartOut(BaseModel):
     id: int
     user_id: int
     items: list[CartItemOut]
-
-    model_config = {"from_attributes": True}
+    total_amount: float

@@ -6,7 +6,7 @@ import {
   isAuthenticated,
   removeToken,
 } from "../services/auth";
-import { getCartCount } from "../services/cart";
+import { getCartCount, subscribeCartUpdated } from "../services/cart";
 import "./Header.css";
 
 export default function Header() {
@@ -37,6 +37,24 @@ export default function Header() {
     };
 
     loadCartCount();
+
+    const unsubscribe = subscribeCartUpdated((count) => {
+      if (typeof count === "number") {
+        setCartCount(count);
+        return;
+      }
+
+      loadCartCount();
+    });
+    const intervalId = window.setInterval(loadCartCount, 2500);
+
+    window.addEventListener("focus", loadCartCount);
+
+    return () => {
+      unsubscribe();
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", loadCartCount);
+    };
   }, [auth]);
 
   useEffect(() => {
@@ -130,6 +148,15 @@ export default function Header() {
               }
             >
               Контакты
+            </NavLink>
+
+            <NavLink
+              to="/b2b"
+              className={({ isActive }) =>
+                isActive ? "site-nav__link active" : "site-nav__link"
+              }
+            >
+              B2B
             </NavLink>
           </nav>
 

@@ -1,12 +1,42 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../services/api";
-import "./Cart.css";
 import toast from "react-hot-toast";
+import api from "../services/api";
+import { emitCartUpdated } from "../services/cart";
+import "./Cart.css";
+
+const priceSourceLabels = {
+  base: "Базовая цена каталога",
+  price_list_discount: "Цена по персональной скидке",
+  price_list_item: "Персональная цена клиента",
+};
+
+function formatPrice(value) {
+  const amount = Number(value || 0);
+  if (amount <= 0) return "Цена по запросу";
+  return `${amount.toLocaleString("ru-RU")} ₸`;
+}
+
+function getCategoryLabel(product) {
+  if (product.category?.name) return product.category.name;
+  if (product.category_name) return product.category_name;
+  if (typeof product.category === "string") return product.category;
+  return "";
+}
+
+function getPrimaryImage(product) {
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    const primary = product.images.find((image) => image.is_primary) || product.images[0];
+    if (primary?.image_url) return primary.image_url;
+  }
+  return product.image_url || "";
+}
 
 export default function Cart() {
   const [cart, setCart] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [productsMap, setProductsMap] = useState({});
+  const [deliveryAddress, setDeliveryAddress] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [ordering, setOrdering] = useState(false);
@@ -16,9 +46,22 @@ export default function Cart() {
       setLoading(true);
       setError("");
 
-      const cartResponse = await api.get("/cart");
+      const [cartResponse, profileResponse] = await Promise.all([
+        api.get("/cart"),
+        api.get("/profile").catch(() => null),
+      ]);
+
       const cartData = cartResponse.data;
+      const profileData = profileResponse?.data || null;
       setCart(cartData);
+      setProfile(profileData);
+      setDeliveryAddress(profileData?.delivery_address || "");
+
+      emitCartUpdated(
+        Array.isArray(cartData.items)
+          ? cartData.items.reduce((sum, item) => sum + Number(item.quantity || 0), 0)
+          : 0
+      );
 
       const items = Array.isArray(cartData.items) ? cartData.items : [];
       const uniqueProductIds = [...new Set(items.map((item) => item.product_id))];
@@ -28,18 +71,15 @@ export default function Cart() {
         return;
       }
 
-      const productRequests = uniqueProductIds.map((productId) =>
-        api.get(`/products/${productId}`)
+      const productResponses = await Promise.all(
+        uniqueProductIds.map((productId) => api.get(`/products/${productId}`))
       );
-
-      const productResponses = await Promise.all(productRequests);
 
       const nextProductsMap = {};
       productResponses.forEach((response) => {
         const product = response.data;
         nextProductsMap[product.id] = product;
       });
-
       setProductsMap(nextProductsMap);
     } catch (err) {
       console.error("Ошибка загрузки корзины:", err);
@@ -55,12 +95,12 @@ export default function Cart() {
 
   const normalizedItems = useMemo(() => {
     const items = Array.isArray(cart?.items) ? cart.items : [];
-
     return items.map((item) => {
       const product = productsMap[item.product_id] || {};
-
-      const price = Number(product.price || 0);
       const quantity = Number(item.quantity || 1);
+      const unitPrice = Number(item.unit_price ?? product.price ?? 0);
+      const basePrice = Number(item.base_price ?? product.price ?? unitPrice);
+      const totalPrice = Number(item.total_price ?? unitPrice * quantity);
 
       return {
         id: item.id,
@@ -69,24 +109,25 @@ export default function Cart() {
         name: product.name || `Товар #${item.product_id}`,
         description: product.description || "",
         sku: product.sku || "",
-        price,
+        brand: product.brand || "Lanttich",
+        categoryName: getCategoryLabel(product),
+        imageUrl: getPrimaryImage(product),
         quantity,
-        total: price * quantity,
+        unitPrice,
+        basePrice,
+        totalPrice,
+        priceSource: item.price_source || "base",
       };
     });
   }, [cart, productsMap]);
 
-  const total = normalizedItems.reduce((sum, item) => sum + item.total, 0);
+  const total = Number(cart?.total_amount ?? normalizedItems.reduce((sum, item) => sum + item.totalPrice, 0));
   const totalCount = normalizedItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const updateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
-
     try {
-      await api.put(`/cart/items/${itemId}`, {
-        quantity: newQuantity,
-      });
-
+      await api.put(`/cart/items/${itemId}`, { quantity: newQuantity });
       await loadCart();
     } catch (err) {
       console.error("Ошибка обновления количества:", err);
@@ -97,7 +138,7 @@ export default function Cart() {
   const removeItem = async (itemId) => {
     try {
       await api.delete(`/cart/items/${itemId}`);
-      toast.success("Товар удалён из корзины");
+      toast.success("Товар удален из корзины");
       await loadCart();
     } catch (err) {
       console.error("Ошибка удаления товара:", err);
@@ -106,32 +147,27 @@ export default function Cart() {
   };
 
   const handleCreateOrder = async () => {
-    const items = Array.isArray(cart?.items) ? cart.items : [];
+    if (normalizedItems.length === 0) {
+      toast.error("Корзина пустая");
+      return;
+    }
 
-    if (items.length === 0) {
-      toast.error("Корзина пуста");
+    if (!deliveryAddress.trim()) {
+      toast.error("Укажите адрес доставки");
       return;
     }
 
     try {
       setOrdering(true);
-
-      const orderData = {
-        items: items.map((item) => ({
-          product_id: item.product_id,
-          quantity: item.quantity,
-        })),
-      };
-
-      await api.post("/orders", orderData);
-
-      await Promise.all(items.map((item) => api.delete(`/cart/items/${item.id}`)));
-
-      toast.success("Заказ успешно оформлен!");
+      await api.post("/orders/from-cart", {
+        delivery_address: deliveryAddress.trim(),
+      });
+      emitCartUpdated(0);
+      toast.success("Заказ успешно оформлен");
       await loadCart();
     } catch (err) {
       console.error("Ошибка заказа:", err);
-      toast.error("Ошибка при оформлении заказа");
+      toast.error(err.response?.data?.detail || "Ошибка при оформлении заказа");
     } finally {
       setOrdering(false);
     }
@@ -142,38 +178,8 @@ export default function Cart() {
       <section className="cart-page">
         <div className="cart-shell">
           <div className="cart-heading">
-            <div className="cart-badge">MF APP</div>
             <div className="cart-skeleton cart-skeleton--title" />
             <div className="cart-skeleton cart-skeleton--text" />
-          </div>
-
-          <div className="cart-layout">
-            <div className="cart-items">
-              {[1, 2, 3].map((item) => (
-                <div className="cart-item cart-item--loading" key={item}>
-                  <div className="cart-skeleton cart-skeleton--image" />
-                  <div className="cart-item__info">
-                    <div className="cart-skeleton cart-skeleton--item-title" />
-                    <div className="cart-skeleton cart-skeleton--item-text" />
-                    <div className="cart-skeleton cart-skeleton--item-text short" />
-                  </div>
-                  <div className="cart-item__meta">
-                    <div className="cart-skeleton cart-skeleton--price" />
-                    <div className="cart-skeleton cart-skeleton--qty" />
-                    <div className="cart-skeleton cart-skeleton--total" />
-                    <div className="cart-skeleton cart-skeleton--btn" />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <aside className="cart-summary">
-              <div className="cart-skeleton cart-skeleton--summary-title" />
-              <div className="cart-skeleton cart-skeleton--summary-row" />
-              <div className="cart-skeleton cart-skeleton--summary-row" />
-              <div className="cart-skeleton cart-skeleton--summary-total" />
-              <div className="cart-skeleton cart-skeleton--summary-btn" />
-            </aside>
           </div>
         </div>
       </section>
@@ -187,9 +193,7 @@ export default function Cart() {
           <div className="cart-state-card">
             <h1 className="cart-state-title">Ошибка загрузки</h1>
             <p className="cart-state-text">{error}</p>
-            <button className="cart-order-btn" onClick={loadCart}>
-              Попробовать снова
-            </button>
+            <button className="cart-order-btn" onClick={loadCart}>Попробовать снова</button>
           </div>
         </div>
       </section>
@@ -202,20 +206,22 @@ export default function Cart() {
         <div className="cart-heading">
           <h1 className="cart-title">Корзина</h1>
           <p className="cart-subtitle">
-            Проверьте товары перед оформлением заказа
+            Проверьте позиции, адрес доставки и оформите заказ. Персональные цены применяются автоматически.
           </p>
         </div>
 
         {normalizedItems.length === 0 ? (
           <div className="cart-state-card">
-            <div className="cart-empty-icon">🛒</div>
-            <h2 className="cart-state-title">Корзина пока пуста</h2>
-            <p className="cart-state-text">
-              Добавьте товары из каталога, чтобы оформить заказ.
-            </p>
-            <Link to="/catalog" className="cart-order-btn cart-order-btn--link">
-              Перейти в каталог
-            </Link>
+            <div className="cart-empty-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 4H5L7.2 14.2C7.3 14.7 7.75 15 8.25 15H17.6C18.08 15 18.5 14.68 18.63 14.21L20.4 8H6.1" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="9" cy="19" r="1.6" fill="currentColor" />
+                <circle cx="17" cy="19" r="1.6" fill="currentColor" />
+              </svg>
+            </div>
+            <h2 className="cart-state-title">Корзина пока пустая</h2>
+            <p className="cart-state-text">Добавьте товары из каталога, чтобы оформить заказ.</p>
+            <Link to="/catalog" className="cart-order-btn cart-order-btn--link">Перейти в каталог</Link>
           </div>
         ) : (
           <div className="cart-layout">
@@ -223,53 +229,38 @@ export default function Cart() {
               {normalizedItems.map((item) => (
                 <div className="cart-item" key={item.id}>
                   <div className="cart-item__image-wrap">
-                    <div className="cart-item__image">Нет фото</div>
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt={item.name} className="cart-item__image" />
+                    ) : (
+                      <div className="cart-item__image cart-item__image--fallback">
+                        <span>{item.brand}</span>
+                        <strong>{item.categoryName || "Мебельная фурнитура"}</strong>
+                      </div>
+                    )}
                   </div>
 
                   <div className="cart-item__info">
-                    <div className="cart-item__badge">Товар</div>
+                    <div className="cart-item__badge">{item.categoryName || "Товар каталога"}</div>
                     <h3>{item.name}</h3>
-
-                    {item.description ? (
-                      <p>{item.description}</p>
-                    ) : (
-                      <p className="cart-item__muted">
-                        Описание для этого товара пока не добавлено.
-                      </p>
-                    )}
-
-                    <span>Артикул: {item.sku || "—"}</span>
+                    <p>{item.description || "Описание для этой позиции пока не добавлено."}</p>
+                    <span>Артикул: {item.sku || "-"}</span>
                   </div>
 
                   <div className="cart-item__meta">
-                    <p className="cart-item__price">{item.price} ₽</p>
-
-                    <div className="cart-qty">
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(item.itemId, item.quantity - 1)}
-                        aria-label="Уменьшить количество"
-                      >
-                        −
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(item.itemId, item.quantity + 1)}
-                        aria-label="Увеличить количество"
-                      >
-                        +
-                      </button>
+                    <div className="cart-item__price-block">
+                      <p className="cart-item__price">{formatPrice(item.unitPrice)}</p>
+                      {item.basePrice > item.unitPrice && <p className="cart-item__price-old">{formatPrice(item.basePrice)}</p>}
+                      <span className="cart-item__price-note">{priceSourceLabels[item.priceSource] || "Цена каталога"}</span>
                     </div>
 
-                    <strong className="cart-item__total">{item.total} ₽</strong>
+                    <div className="cart-qty">
+                      <button type="button" onClick={() => updateQuantity(item.itemId, item.quantity - 1)} aria-label="Уменьшить количество">-</button>
+                      <span>{item.quantity}</span>
+                      <button type="button" onClick={() => updateQuantity(item.itemId, item.quantity + 1)} aria-label="Увеличить количество">+</button>
+                    </div>
 
-                    <button
-                      className="cart-remove-btn"
-                      onClick={() => removeItem(item.itemId)}
-                    >
-                      Удалить
-                    </button>
+                    <strong className="cart-item__total">{formatPrice(item.totalPrice)}</strong>
+                    <button className="cart-remove-btn" onClick={() => removeItem(item.itemId)}>Удалить</button>
                   </div>
                 </div>
               ))}
@@ -280,33 +271,35 @@ export default function Cart() {
               <h2>Итого</h2>
 
               <div className="cart-summary__rows">
-                <div className="cart-summary__row">
-                  <span>Товаров</span>
-                  <strong>{totalCount}</strong>
-                </div>
+                <div className="cart-summary__row"><span>Товаров</span><strong>{totalCount}</strong></div>
+                <div className="cart-summary__row"><span>Позиций</span><strong>{normalizedItems.length}</strong></div>
+                <div className="cart-summary__row"><span>Клиент</span><strong>{profile?.company || profile?.email || "B2B"}</strong></div>
+              </div>
 
-                <div className="cart-summary__row">
-                  <span>Позиций</span>
-                  <strong>{normalizedItems.length}</strong>
-                </div>
+              <div className="cart-delivery">
+                <label htmlFor="delivery_address">Адрес доставки</label>
+                <textarea
+                  id="delivery_address"
+                  value={deliveryAddress}
+                  onChange={(e) => setDeliveryAddress(e.target.value)}
+                  placeholder="Город, улица, дом, офис или склад"
+                />
+                <Link to="/profile">Изменить данные клиента в профиле</Link>
               </div>
 
               <div className="cart-summary__total">
                 <span>Общая сумма</span>
-                <strong>{total} ₽</strong>
+                <strong>{formatPrice(total)}</strong>
               </div>
 
-              <button
-                className="cart-order-btn"
-                onClick={handleCreateOrder}
-                disabled={ordering}
-              >
+              <p className="cart-summary__hint">
+                В заказе фиксируются текущие цены, данные клиента и адрес доставки.
+              </p>
+
+              <button className="cart-order-btn" onClick={handleCreateOrder} disabled={ordering}>
                 {ordering ? "Оформляем..." : "Оформить заказ"}
               </button>
-
-              <Link to="/catalog" className="cart-back-link">
-                Продолжить покупки
-              </Link>
+              <Link to="/catalog" className="cart-back-link">Продолжить покупки</Link>
             </aside>
           </div>
         )}

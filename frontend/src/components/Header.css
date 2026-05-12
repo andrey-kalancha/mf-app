@@ -12,7 +12,7 @@
 }
 
 .site-header__top {
-  padding: 26px 0 18px;
+  padding: 18px 0 14px;
 }
 
 .site-header__top-inner {
@@ -23,7 +23,7 @@
 }
 
 .site-logo img {
-  height: 160px;
+  height: 112px;
   width: auto;
   object-fit: contain;
 }
@@ -38,7 +38,7 @@
 
 .site-header__phone {
   color: #ffffff;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   display: block;
   margin: 0;
@@ -65,7 +65,7 @@
 }
 
 .site-header__nav-inner {
-  min-height: 68px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -75,7 +75,7 @@
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
@@ -83,6 +83,7 @@
   color: #ffffff;
   text-decoration: none;
   font-weight: 600;
+  font-size: 15px;
   position: relative;
   transition: 0.2s;
   white-space: nowrap;
@@ -122,9 +123,9 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 48px;
-  padding: 0 16px;
-  border-radius: 999px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   text-decoration: none;
@@ -181,7 +182,7 @@
   align-items: center;
   gap: 10px;
   padding: 8px 14px 8px 8px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   text-decoration: none;
@@ -244,7 +245,7 @@
   right: 0;
   width: 260px;
   padding: 12px;
-  border-radius: 18px;
+  border-radius: 8px;
   background: #031f3b;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
@@ -266,7 +267,7 @@
   color: rgba(255, 255, 255, 0.55);
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
 }
 
 .site-profile-menu__header strong {
@@ -281,7 +282,7 @@
   align-items: center;
   min-height: 44px;
   padding: 0 12px;
-  border-radius: 12px;
+  border-radius: 8px;
   background: transparent;
   border: none;
   color: #ffffff;
@@ -337,7 +338,7 @@
 
 @media (max-width: 640px) {
   .site-logo img {
-    height: 120px;
+    height: 92px;
   }
 
   .site-nav {

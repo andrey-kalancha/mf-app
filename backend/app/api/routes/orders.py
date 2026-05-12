@@ -9,11 +9,18 @@ from app.models.cart import Cart, CartItem
 from app.models.order import Order, OrderItem
 from app.models.product import Product
 from app.models.user import User
-from app.schemas.order import OrderCreate, OrderOut, OrderStatusUpdate
+from app.schemas.order import OrderCreate, OrderFromCartCreate, OrderOut, OrderStatusUpdate
+from app.services.pricing import resolve_product_price
 
 router = APIRouter(tags=["orders"])
 
 ALLOWED_ORDER_STATUSES = {"new", "processing", "shipped", "canceled"}
+
+
+def get_customer_name(user: User) -> str:
+    return " ".join(
+        part for part in [user.first_name, user.last_name] if part
+    ).strip() or user.email
 
 
 @router.post("/orders", response_model=OrderOut, status_code=status.HTTP_201_CREATED)
@@ -43,6 +50,10 @@ def create_order(
         user_id=current_user.id,
         status="new",
         total_amount=Decimal("0.00"),
+        delivery_address=(order_in.delivery_address or current_user.delivery_address or "").strip() or None,
+        customer_name=get_customer_name(current_user),
+        customer_phone=current_user.phone,
+        customer_company=current_user.company,
     )
     db.add(order)
     db.flush()
@@ -51,16 +62,22 @@ def create_order(
 
     for item in order_in.items:
         product = products_map[item.product_id]
+        pricing = resolve_product_price(
+            db,
+            user_id=current_user.id,
+            product=product,
+            quantity=item.quantity,
+        )
 
         order_item = OrderItem(
             order_id=order.id,
             product_id=product.id,
             quantity=item.quantity,
-            price=Decimal(str(product.price)),
+            price=pricing["unit_price"],
         )
         db.add(order_item)
 
-        total_amount += Decimal(str(product.price)) * item.quantity
+        total_amount += pricing["unit_price"] * item.quantity
 
     order.total_amount = total_amount
 
@@ -77,6 +94,7 @@ def create_order(
 
 @router.post("/orders/from-cart", response_model=OrderOut, status_code=status.HTTP_201_CREATED)
 def create_order_from_cart(
+    order_in: OrderFromCartCreate | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_authenticated),
 ):
@@ -108,6 +126,10 @@ def create_order_from_cart(
         user_id=current_user.id,
         status="new",
         total_amount=Decimal("0.00"),
+        delivery_address=((order_in.delivery_address if order_in else None) or current_user.delivery_address or "").strip() or None,
+        customer_name=get_customer_name(current_user),
+        customer_phone=current_user.phone,
+        customer_company=current_user.company,
     )
     db.add(order)
     db.flush()
@@ -116,16 +138,22 @@ def create_order_from_cart(
 
     for cart_item in cart.items:
         product = products_map[cart_item.product_id]
+        pricing = resolve_product_price(
+            db,
+            user_id=current_user.id,
+            product=product,
+            quantity=cart_item.quantity,
+        )
 
         order_item = OrderItem(
             order_id=order.id,
             product_id=product.id,
             quantity=cart_item.quantity,
-            price=Decimal(str(product.price)),
+            price=pricing["unit_price"],
         )
         db.add(order_item)
 
-        total_amount += Decimal(str(product.price)) * cart_item.quantity
+        total_amount += pricing["unit_price"] * cart_item.quantity
 
     order.total_amount = total_amount
 

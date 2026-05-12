@@ -5,7 +5,7 @@ from app.api.deps import require_authenticated
 from app.core.database import get_db
 from app.core.security import hash_password, verify_password
 from app.models.user import User
-from app.schemas.user import UserOut, UserUpdate, UserPasswordUpdate
+from app.schemas.user import UserOut, UserPasswordUpdate, UserUpdate
 
 router = APIRouter(tags=["profile"])
 
@@ -37,6 +37,10 @@ def update_profile(
     current_user.email = user_in.email
     current_user.first_name = user_in.first_name
     current_user.last_name = user_in.last_name
+    current_user.phone = user_in.phone
+    current_user.company = user_in.company
+    current_user.city = user_in.city
+    current_user.delivery_address = user_in.delivery_address
 
     db.commit()
     db.refresh(current_user)

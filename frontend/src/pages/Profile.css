@@ -150,16 +150,26 @@
   gap: 8px;
 }
 
-.profile-field label {
+.auth-field,
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-field label,
+.auth-field label {
   color: rgba(255, 255, 255, 0.76);
   font-size: 14px;
   font-weight: 600;
 }
 
-.profile-field input {
+.profile-field input,
+.profile-field textarea,
+.auth-field input {
   min-height: 54px;
   padding: 0 16px;
-  border-radius: 16px;
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(0, 0, 0, 0.22);
   color: #ffffff;
@@ -167,7 +177,15 @@
   outline: none;
 }
 
-.profile-field input:focus {
+.profile-field textarea {
+  min-height: 112px;
+  padding: 14px 16px;
+  resize: vertical;
+}
+
+.profile-field input:focus,
+.profile-field textarea:focus,
+.auth-field input:focus {
   border-color: #8fe7ff;
   box-shadow: 0 0 0 3px rgba(143, 231, 255, 0.14);
 }

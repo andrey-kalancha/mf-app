@@ -6,6 +6,10 @@ class UserCreate(BaseModel):
     password: str
     first_name: str
     last_name: str
+    phone: str | None = None
+    company: str | None = None
+    city: str | None = None
+    delivery_address: str | None = None
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -16,6 +20,10 @@ class UserUpdate(BaseModel):
     email: EmailStr
     first_name: str | None = None
     last_name: str | None = None
+    phone: str | None = None
+    company: str | None = None
+    city: str | None = None
+    delivery_address: str | None = None
 
 
 class UserPasswordUpdate(BaseModel):
@@ -36,6 +44,10 @@ class UserOut(BaseModel):
     email: EmailStr
     first_name: str | None = None
     last_name: str | None = None
+    phone: str | None = None
+    company: str | None = None
+    city: str | None = None
+    delivery_address: str | None = None
     role: str
     is_active: bool
 

@@ -1,25 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../services/api";
 import toast from "react-hot-toast";
-import { setToken } from "../services/auth";
+import api from "../services/api";
+import PasswordInput from "../components/PasswordInput";
+import { setCurrentUser, setToken } from "../services/auth";
 import "./Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -27,18 +20,18 @@ export default function Login() {
 
     try {
       setLoading(true);
-
       const params = new URLSearchParams();
       params.append("username", form.email);
       params.append("password", form.password);
 
       const response = await api.post("/auth/login", params, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
-      saveToken(response.data.access_token);
+      setToken(response.data.access_token);
+      const meResponse = await api.get("/auth/me");
+      setCurrentUser(meResponse.data);
+
       toast.success("Вы успешно вошли");
       navigate("/");
       window.location.reload();
@@ -60,8 +53,9 @@ export default function Login() {
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label>Email</label>
+            <label htmlFor="email">Email</label>
             <input
+              id="email"
               type="email"
               name="email"
               placeholder="example@mail.com"
@@ -71,17 +65,14 @@ export default function Login() {
             />
           </div>
 
-          <div className="auth-field">
-            <label>Пароль</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Введите пароль"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <PasswordInput
+            label="Пароль"
+            name="password"
+            placeholder="Введите пароль"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
 
           <div className="auth-links">
             <Link to="/forgot-password" className="auth-link">

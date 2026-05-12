@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../services/api";
 import toast from "react-hot-toast";
+import api from "../services/api";
+import PasswordInput from "../components/PasswordInput";
 import "./Register.css";
 
 export default function Register() {
   const navigate = useNavigate();
-
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -14,16 +14,11 @@ export default function Register() {
     password: "",
     acceptPolicy: false,
   });
-
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   };
 
   const handleSubmit = async (e) => {
@@ -36,7 +31,6 @@ export default function Register() {
 
     try {
       setLoading(true);
-
       await api.post("/auth/register", {
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
@@ -47,7 +41,7 @@ export default function Register() {
       toast.success("Регистрация успешна");
       navigate("/login");
     } catch (err) {
-      console.error(err);
+      console.error("Ошибка регистрации:", err);
       toast.error(err.response?.data?.detail || "Ошибка регистрации");
     } finally {
       setLoading(false);
@@ -65,8 +59,9 @@ export default function Register() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-row">
             <div className="auth-field">
-              <label>Имя</label>
+              <label htmlFor="first_name">Имя</label>
               <input
+                id="first_name"
                 type="text"
                 name="first_name"
                 placeholder="Введите имя"
@@ -77,8 +72,9 @@ export default function Register() {
             </div>
 
             <div className="auth-field">
-              <label>Фамилия</label>
+              <label htmlFor="last_name">Фамилия</label>
               <input
+                id="last_name"
                 type="text"
                 name="last_name"
                 placeholder="Введите фамилию"
@@ -90,8 +86,9 @@ export default function Register() {
           </div>
 
           <div className="auth-field">
-            <label>Email</label>
+            <label htmlFor="email">Email</label>
             <input
+              id="email"
               type="email"
               name="email"
               placeholder="example@mail.com"
@@ -101,17 +98,14 @@ export default function Register() {
             />
           </div>
 
-          <div className="auth-field">
-            <label>Пароль</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Введите пароль"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <PasswordInput
+            label="Пароль"
+            name="password"
+            placeholder="Введите пароль"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
 
           <label className="auth-checkbox">
             <input
@@ -120,11 +114,14 @@ export default function Register() {
               checked={form.acceptPolicy}
               onChange={handleChange}
             />
-            <span>Я согласен с политикой конфиденциальности</span>
+            <span>
+              Я согласен с{" "}
+              <Link to="/privacy-policy">политикой конфиденциальности</Link>
+            </span>
           </label>
 
           <button type="submit" disabled={loading} className="auth-btn">
-            {loading ? "Создаём..." : "Зарегистрироваться"}
+            {loading ? "Создаем..." : "Зарегистрироваться"}
           </button>
         </form>
 

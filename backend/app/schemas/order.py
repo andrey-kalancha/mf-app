@@ -10,6 +10,11 @@ class OrderItemCreate(BaseModel):
 
 class OrderCreate(BaseModel):
     items: list[OrderItemCreate]
+    delivery_address: str | None = None
+
+
+class OrderFromCartCreate(BaseModel):
+    delivery_address: str | None = None
 
 
 class OrderItemOut(BaseModel):
@@ -26,6 +31,10 @@ class OrderOut(BaseModel):
     user_id: int
     status: str
     total_amount: float
+    delivery_address: str | None = None
+    customer_name: str | None = None
+    customer_phone: str | None = None
+    customer_company: str | None = None
     created_at: datetime
     items: list[OrderItemOut]
 

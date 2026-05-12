@@ -1,11 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import ScrollToTop from "./components/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import About from "./pages/About";
 import Contacts from "./pages/Contacts";
+import B2B from "./pages/B2B";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
@@ -20,16 +22,22 @@ import AdminEditCategory from "./pages/AdminEditCategory";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminOrders from "./pages/AdminOrders";
 import AdminUsers from "./pages/AdminUsers";
+import AdminPriceLists from "./pages/AdminPriceLists";
+import AdminIntegrations from "./pages/AdminIntegrations";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/about" element={<About />} />
           <Route path="/contacts" element={<Contacts />} />
+          <Route path="/b2b" element={<B2B />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -85,6 +93,24 @@ function App() {
             element={
               <AdminRoute>
                 <AdminUsers />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/admin/price-lists"
+            element={
+              <AdminRoute>
+                <AdminPriceLists />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/admin/integrations"
+            element={
+              <AdminRoute>
+                <AdminIntegrations />
               </AdminRoute>
             }
           />

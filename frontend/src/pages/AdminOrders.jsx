@@ -345,6 +345,20 @@ export default function AdminOrders() {
                     </button>
                   </div>
 
+                  {order.delivery_address && (
+                    <div className="admin-order-delivery">
+                      <span>Адрес доставки</span>
+                      <strong>{order.delivery_address}</strong>
+                      {(order.customer_name || order.customer_phone || order.customer_company) && (
+                        <p>
+                          {[order.customer_company, order.customer_name, order.customer_phone]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   <div className="admin-order-items">
                     {order.normalizedItems.length === 0 ? (
                       <div className="admin-order-item admin-order-item--empty">

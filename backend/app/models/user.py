@@ -13,6 +13,10 @@ class User(Base):
 
     first_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     last_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    company: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    city: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    delivery_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     role: Mapped[str] = mapped_column(String(50), default="client", nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

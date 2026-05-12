@@ -25,6 +25,10 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         password_hash=hash_password(user_in.password),
         first_name=user_in.first_name,
         last_name=user_in.last_name,
+        phone=user_in.phone,
+        company=user_in.company,
+        city=user_in.city,
+        delivery_address=user_in.delivery_address,
         role="client",
         is_active=True,
     )

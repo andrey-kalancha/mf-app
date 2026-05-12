@@ -10,7 +10,34 @@ const statusLabels = {
   canceled: "Отменён",
 };
 
-const getStatusClassName = (status) => {
+function formatPrice(value) {
+  const amount = Number(value || 0);
+  if (amount <= 0) {
+    return "Цена по запросу";
+  }
+
+  return `${amount.toLocaleString("ru-RU")} ₸`;
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function getStatusClassName(status) {
   switch (status) {
     case "processing":
       return "order-status order-status--processing";
@@ -22,7 +49,27 @@ const getStatusClassName = (status) => {
     default:
       return "order-status order-status--new";
   }
-};
+}
+
+function getPrimaryImage(product) {
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    const primary =
+      product.images.find((image) => image.is_primary) || product.images[0];
+
+    if (primary?.image_url) {
+      return primary.image_url;
+    }
+  }
+
+  return product.image_url || "";
+}
+
+function getCategoryLabel(product) {
+  if (product.category?.name) return product.category.name;
+  if (product.category_name) return product.category_name;
+  if (typeof product.category === "string") return product.category;
+  return "";
+}
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -85,22 +132,32 @@ export default function Orders() {
       const normalizedItems = Array.isArray(order.items)
         ? order.items.map((item) => {
             const product = productsMap[item.product_id] || {};
-            const price = Number(product.price || 0);
+            const unitPrice = Number(item.price || 0);
             const quantity = Number(item.quantity || 1);
+            const currentCatalogPrice = Number(product.price || 0);
 
             return {
               id: item.id,
               productId: item.product_id,
               name: product.name || `Товар #${item.product_id}`,
               sku: product.sku || "",
-              price,
+              brand: product.brand || "Lanttich",
+              categoryName: getCategoryLabel(product),
+              imageUrl: getPrimaryImage(product),
+              price: unitPrice,
               quantity,
-              total: price * quantity,
+              total: unitPrice * quantity,
+              hasChangedPrice:
+                currentCatalogPrice > 0 &&
+                Math.abs(currentCatalogPrice - unitPrice) > 0.009,
             };
           })
         : [];
 
-      const total = normalizedItems.reduce((sum, item) => sum + item.total, 0);
+      const total = Number(
+        order.total_amount ??
+          normalizedItems.reduce((sum, item) => sum + item.total, 0)
+      );
       const totalCount = normalizedItems.reduce((sum, item) => sum + item.quantity, 0);
 
       return {
@@ -108,6 +165,7 @@ export default function Orders() {
         normalizedItems,
         total,
         totalCount,
+        createdLabel: formatDate(order.created_at),
       };
     });
   }, [orders, productsMap]);
@@ -181,7 +239,8 @@ export default function Orders() {
         <div className="orders-heading">
           <h1 className="orders-title">Мои заказы</h1>
           <p className="orders-subtitle">
-            Здесь отображаются все оформленные вами заказы
+            Здесь сохраняются оформленные вами заказы с зафиксированной ценой на
+            момент покупки.
           </p>
         </div>
 
@@ -215,28 +274,64 @@ export default function Orders() {
                       <p>
                         Товаров: <strong>{order.totalCount}</strong> · Позиций:{" "}
                         <strong>{order.normalizedItems.length}</strong>
+                        {order.createdLabel && (
+                          <>
+                            {" "}· Дата: <strong>{order.createdLabel}</strong>
+                          </>
+                        )}
                       </p>
                     </div>
 
                     <div className="order-card__total">
                       <span>Сумма заказа</span>
-                      <strong>{order.total} ₽</strong>
+                      <strong>{formatPrice(order.total)}</strong>
                     </div>
                   </div>
+
+                  {order.delivery_address && (
+                    <div className="order-delivery">
+                      <span>Адрес доставки</span>
+                      <strong>{order.delivery_address}</strong>
+                    </div>
+                  )}
 
                   <div className="order-items">
                     {order.normalizedItems.map((item) => (
                       <div className="order-item" key={item.id}>
+                        <div className="order-item__media">
+                          {item.imageUrl ? (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="order-item__image"
+                            />
+                          ) : (
+                            <div className="order-item__image order-item__image--fallback">
+                              <span>{item.brand}</span>
+                              <strong>
+                                {item.categoryName || "Мебельная фурнитура"}
+                              </strong>
+                            </div>
+                          )}
+                        </div>
+
                         <div className="order-item__info">
-                          <div className="order-item__badge">Товар</div>
+                          <div className="order-item__badge">
+                            {item.categoryName || "Товар каталога"}
+                          </div>
                           <h3>{item.name}</h3>
                           <p>Артикул: {item.sku || "—"}</p>
                         </div>
 
                         <div className="order-item__meta">
-                          <span>{item.price} ₽</span>
+                          <span>{formatPrice(item.price)}</span>
                           <span>× {item.quantity}</span>
-                          <strong>{item.total} ₽</strong>
+                          <strong>{formatPrice(item.total)}</strong>
+                          {item.hasChangedPrice && (
+                            <span className="order-item__price-note">
+                              Цена в заказе зафиксирована
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}
